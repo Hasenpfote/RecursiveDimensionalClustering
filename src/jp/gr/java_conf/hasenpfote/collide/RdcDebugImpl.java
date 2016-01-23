@@ -3,7 +3,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 
 
 
@@ -28,10 +31,21 @@ public class RdcDebugImpl implements IDebugRender{
 		for(BBox cluster : clusters){
 			cluster.render(g2d);
 		}
+
+		Point2D.Double p = new Point2D.Double();
+		Point2D.Double s = new Point2D.Double();
+		Point2D.Double e = new Point2D.Double();
+		AffineTransform wtos = GameSystem.getInstance().getWorldToScreenMatrix();
+
 		g2d.setColor(Color.RED);
 		for(CollisionPair pair : pairs){
-			g2d.drawLine((int)pair.first.getCogX(), (int)pair.first.getCogY(), (int)pair.second.getCogX(), (int)pair.second.getCogY());
+			p.setLocation(pair.first.getCogX(), pair.first.getCogY());
+			wtos.transform(p, s);
+			p.setLocation(pair.second.getCogX(), pair.second.getCogY());
+			wtos.transform(p, e);
+			g2d.drawLine((int)s.x, (int)s.y, (int)e.x, (int)e.y);
 		}
+
 		g2d.setFont(font);
 		FontMetrics metrics = g2d.getFontMetrics();
 		g2d.setColor(Color.YELLOW);
@@ -41,7 +55,7 @@ public class RdcDebugImpl implements IDebugRender{
 		int rate = (int)((double)num_combinations / max_combinations * 100);
 		g2d.drawString("combinations=" + num_combinations + " / " + max_combinations + " (" + rate + "%)", 0, 3 * metrics.getHeight() + metrics.getAscent());
 	}
-	
+
 	public void registerCluster(ArrayList<Shape> group){
 		Shape object = group.get(0);
 		double min_x = object.getMinX();
@@ -52,7 +66,7 @@ public class RdcDebugImpl implements IDebugRender{
 
 		if(size >= 2)
 			num_combinations += combination(size, 2);
-		
+
 		for(int i = 1; i < size; i++){
 			object = group.get(i);
 			if(object.getMinX() < min_x)
@@ -76,7 +90,7 @@ public class RdcDebugImpl implements IDebugRender{
 		if((x * x + y * y) > (r * r))
 			return;
 		pairs.add(new CollisionPair(first, second));
-	}	
+	}
 
 	public void clearAll(){
 		clusters.clear();

@@ -1,3 +1,4 @@
+import java.awt.BasicStroke;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
@@ -11,7 +12,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Random;
 import java.util.Vector;
@@ -22,6 +27,7 @@ import jp.gr.java_conf.hasenpfote.collide.Rdc;
 import jp.gr.java_conf.hasenpfote.collide.RdcDebugImpl;
 import jp.gr.java_conf.hasenpfote.collide.Shape;
 import jp.gr.java_conf.hasenpfote.framework.GameEngine;
+import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
 import jp.gr.java_conf.hasenpfote.framework.MouseInput;
 
@@ -35,6 +41,7 @@ public final class SampleGameEngine extends GameEngine{
 		MOUSE
 	}
 
+	private static final double PIXELS_PER_METER = 100.0;
 	private int screen_width;
 	private int screen_height;
 	private KeyboardInput keyboard = null;
@@ -43,27 +50,27 @@ public final class SampleGameEngine extends GameEngine{
 	private boolean debug = true;
 	private Font font = null;
 
-	private static final double PIXELS_PER_METER = 100.0;
-	private static final double G = 0.0;//9.80665;
+	private static final double G = 9.80665;
 
 	// 外力[N]
 	private double u_f = 0.0;
 	private double d_f = 0.0;
 	private double l_f = 0.0;
 	private double r_f = 0.0;
-	// 撃力
-	private double impulse = 0.0f;
 
-
-	private static int NUM_BALLS = 100;
+	private static int NUM_BALLS = 20;
 	private ArrayList<Shape> objects = null;
 	private Random rnd = new Random();
 	private Rdc rdc = null;
 	private ArrayList<IDebugRender> debug_render_list = null;
 	private RdcDebugImpl rdc_debug = null;
 
-	Vector< Point > lines = new Vector< Point >();
-	boolean drawingLine;
+	private Point2D.Double wall_min = null;
+	private Point2D.Double wall_max = null;
+
+
+	//Vector< Point > lines = new Vector< Point >();
+	//boolean drawingLine;
 
 	public SampleGameEngine(Canvas canvas, EnumSet<InputDevice> flag){
 		super(DEFAULT_FPS, canvas.getBufferStrategy());
@@ -86,18 +93,35 @@ public final class SampleGameEngine extends GameEngine{
 
 	@Override
 	protected void initialize(){
+		GameSystem.getInstance().setScreenSize(screen_width, screen_height);
+		GameSystem.getInstance().setPixelsPerUnit((int)PIXELS_PER_METER);
+		GameSystem.getInstance().updateMarix();
+
 		objects = new ArrayList<Shape>();
 		debug_render_list = new ArrayList<IDebugRender>();
 		rdc_debug = new RdcDebugImpl();
 		debug_render_list.add(rdc_debug);
 		rdc = new Rdc(rdc_debug);
 
+		wall_min = new Point2D.Double();
+		wall_max = new Point2D.Double();
+		Point2D.Double min = new Point2D.Double(0.0, screen_height);
+		Point2D.Double max = new Point2D.Double(screen_width, 0.0);
+		AffineTransform wtos = GameSystem.getInstance().getWorldToScreenMatrix();
+		try{
+			wtos.inverseTransform(min, wall_min);
+			wtos.inverseTransform(max, wall_max);
+		}catch(NoninvertibleTransformException e){
+		}
+
+		double wall_width = wall_max.x - wall_min.x;
+		double wall_height = wall_max.y - wall_min.y;
 		for(int i = 0; i < NUM_BALLS; i++){
-			Ball ball = new Ball(rnd.nextInt(screen_width),
-								 rnd.nextInt(screen_height),
+			Ball ball = new Ball((rnd.nextDouble() - 0.5) * wall_width,
+								 (rnd.nextDouble() - 0.5) * wall_height,
 								 rnd.nextInt(40) - 20,
 								 rnd.nextInt(40) - 20,
-								 rnd.nextInt(10) + 11
+								 rnd.nextDouble() * 0.25 + 0.75
 								);
 			objects.add(ball);
 		}
@@ -122,33 +146,26 @@ public final class SampleGameEngine extends GameEngine{
 		if(keyboard.isKeyDownOnce(KeyEvent.VK_F1))
 			debug = !debug;
 
-		if(keyboard.isKeyDownOnce(KeyEvent.VK_ENTER)){
-			impulse = G * 1000.0;
-		}
-		if(keyboard.isKeyUp(KeyEvent.VK_ENTER)){
-			impulse = 0.0;
-		}
-
 		if(keyboard.isKeyDown(KeyEvent.VK_UP)){
-			u_f = G * 1000.0;
+			u_f = 100.0;
 		}
 		if(keyboard.isKeyUp(KeyEvent.VK_UP)){
 			u_f = 0.0;
 		}
 		if(keyboard.isKeyDown(KeyEvent.VK_DOWN)){
-			d_f = -G * 1000.0;
+			d_f = -100.0;
 		}
 		if(keyboard.isKeyUp(KeyEvent.VK_DOWN)){
 			d_f = 0.0;
 		}
 		if(keyboard.isKeyDown(KeyEvent.VK_LEFT)){
-			l_f = -1000.0;
+			l_f = -100.0;
 		}
 		if(keyboard.isKeyUp(KeyEvent.VK_LEFT)){
 			l_f = 0.0;
 		}
 		if(keyboard.isKeyDown(KeyEvent.VK_RIGHT)){
-			r_f = 1000.0;
+			r_f = 100.0;
 		}
 		if(keyboard.isKeyUp(KeyEvent.VK_RIGHT)){
 			r_f = 0.0;
@@ -156,6 +173,7 @@ public final class SampleGameEngine extends GameEngine{
 
 		// if button pressed for first time,
 		// start drawing lines
+		/*
 		if( mouse.isButtonDownOnce( 1 ) ) {
 			drawingLine = true;
 		}
@@ -168,6 +186,21 @@ public final class SampleGameEngine extends GameEngine{
 			lines.add( null );
 			drawingLine = false;
 		}
+		*/
+	}
+
+	/**
+	 * 衝突応答
+	 * @param e		反発係数
+	 * @param m1	剛体1の質量
+	 * @param m2	剛体2の質量
+	 * @param v1	剛体1の速度
+	 * @param v2	剛体2の速度
+	 * @return 力積
+	 */
+	double calcImpulse(double e, double m1, double m2, double v1, double v2){
+		double I = (1.0 + e) * (m1 * m2) / (m1 + m2) * (v2 - v1);
+		return I;
 	}
 
 	@Override
@@ -175,13 +208,18 @@ public final class SampleGameEngine extends GameEngine{
 		if(pause)
 			return;
 
+		double right  = (double)screen_width / PIXELS_PER_METER;
+		double top = (double)screen_height / PIXELS_PER_METER;
+
+
 		// 反発係数
-		double coef = 0.75;
+		double e = 0.25;
 
 		// 合力
 		double fx = l_f + r_f;
 		double fy = u_f + d_f;
 
+		double m = 1000.0;
 
 		for(Shape object : objects){
 			Ball o = (Ball)object;
@@ -195,27 +233,30 @@ public final class SampleGameEngine extends GameEngine{
 			// 速度
 			o.vx += ax * dt;
 			o.vy += ay * dt;
-			// 撃力
-			o.vy += impulse * dt * o.inv_m;
 			// 変位
-			o.px += o.vx * dt * PIXELS_PER_METER;
-			o.py -= o.vy * dt * PIXELS_PER_METER;
+			o.px += o.vx * dt;
+			o.py += o.vy * dt;
+
 			// 壁との衝突処理
-			if(o.px < o.r){
-				o.px = o.r;
-				o.vx = -o.vx * coef;
+			if(o.px < (wall_min.x + o.r)){
+				o.px = wall_min.x + o.r;
+				double I = calcImpulse(e, o.m, m, o.vx, 0.0);
+				o.vx += I * o.inv_m;
 			}
-			if(o.px > ((double)screen_width - o.r)){
-				o.px = (double)screen_width - o.r;
-				o.vx = -o.vx * coef;
+			if(o.px > (wall_max.x - o.r)){
+				o.px = wall_max.x - o.r;
+				double I = calcImpulse(e, o.m, m, o.vx, 0.0);
+				o.vx += I * o.inv_m;
 			}
-			if(o.py < o.r){
-				o.py = o.r;
-				o.vy = -o.vy * coef;
+			if(o.py < (wall_min.y + o.r)){
+				o.py = wall_min.y + o.r;
+				double I = calcImpulse(e, o.m, m, o.vy, 0.0);
+				o.vy += I * o.inv_m;
 			}
-			if(o.py >= ((double)screen_height - o.r)){
-				o.py = (double)screen_height - o.r;
-				o.vy = -o.vy * coef;
+			if(o.py > (wall_max.y - o.r)){
+				o.py = wall_max.y - o.r;
+				double I = calcImpulse(e, o.m, m, o.vy, 0.0);
+				o.vy += I * o.inv_m;
 			}
 		}
 
@@ -224,47 +265,6 @@ public final class SampleGameEngine extends GameEngine{
 			o.clearForce();
 		}
 
-/*
-		// 反発係数
-		double coef = 0.75;
-
-		// 合力
-		double fx = l_f + r_f;
-		double fy = u_f + d_f;
-
-		for(Shape object : objects){
-			Ball o = (Ball)object;
-			// 加速度
-			double ax = fx / o.m;
-			double ay = fy / o.m;
-			ay -= G;
-			// 速度
-			o.vx += ax * dt;
-			o.vy += ay * dt;
-			// 撃力
-			o.vy += impulse * dt;
-			// 変位
-			o.px += o.vx * dt * PIXELS_PER_METER;
-			o.py -= o.vy * dt * PIXELS_PER_METER;
-			// 壁との衝突処理
-			if(o.px < o.r){
-				o.px = o.r;
-				o.vx = -o.vx * coef;
-			}
-			if(o.px > ((double)screen_width - o.r)){
-				o.px = (double)screen_width - o.r;
-				o.vx = -o.vx * coef;
-			}
-			if(o.py < o.r){
-				o.py = o.r;
-				o.vy = -o.vy * coef;
-			}
-			if(o.py >= ((double)screen_height - o.r)){
-				o.py = (double)screen_height - o.r;
-				o.vy = -o.vy * coef;
-			}
-		}
-*/
 		rdc.recursiveClustering(objects);
 	}
 
@@ -274,16 +274,19 @@ public final class SampleGameEngine extends GameEngine{
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// 背景のクリア
 		g2d.clearRect(0, 0, screen_width, screen_height);
+
 		{
 			g2d.setColor(Color.WHITE);
 			for(Shape object : objects){
 				object.render(g2d);
 			}
+
 			if(debug){
 				for(IDebugRender dr : debug_render_list){
 					dr.render(g2d);
 				}
 			}
+/*
 			// Set line color
 			g2d.setColor(  Color.WHITE );
 			// If just one line, draw a point
@@ -304,6 +307,7 @@ public final class SampleGameEngine extends GameEngine{
 						g2d.drawLine( p1.x, p1.y, p2.x, p2.y );
 				}
 			}
+*/
 		}
 		// FPSの表示
 		g2d.setFont(font);

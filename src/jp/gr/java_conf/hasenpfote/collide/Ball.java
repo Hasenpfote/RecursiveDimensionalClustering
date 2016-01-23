@@ -1,9 +1,15 @@
 package jp.gr.java_conf.hasenpfote.collide;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 
 
 public class Ball extends Shape{
+
+	private static final BasicStroke bs = new BasicStroke(0.1f);
 
 	public double px;
 	public double py;
@@ -14,9 +20,6 @@ public class Ball extends Shape{
 	public double inv_m;
 	public double fx;
 	public double fy;
-
-	public Ball(){
-	}
 
 	public Ball(double px, double py, double vx, double vy, double r){
 		set(px, py, vx, vy, r);
@@ -49,8 +52,16 @@ public class Ball extends Shape{
 	}
 	@Override
 	public void render(Graphics2D g2d){
-		double diameter = r + r;
-		g2d.drawOval((int)(px - r), (int)(py - r), (int)diameter, (int)diameter);
+		AffineTransform old = g2d.getTransform();
+		Stroke olds = g2d.getStroke();
+
+		g2d.setTransform(GameSystem.getInstance().getWorldToScreenMatrix());
+		g2d.translate(px, py);
+		g2d.scale(r, r);
+		g2d.setStroke(bs);
+		g2d.drawOval(-1, -1, 2, 2);
+		g2d.setStroke(olds);
+		g2d.setTransform(old);
 	}
 
 	public void addForce(double fx, double fy){
@@ -61,6 +72,4 @@ public class Ball extends Shape{
 	public void clearForce(){
 		fx = fy = 0;
 	}
-
-
 }
