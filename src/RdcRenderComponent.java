@@ -1,4 +1,6 @@
 
+import jp.gr.java_conf.hasenpfote.math.Util;
+
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -32,9 +34,9 @@ public class RdcRenderComponent {
 		for(Rdc.Cluster cluster : clusters){
 			int size = cluster.group.size();
 			num_objects += size;
-			num_combinations += (size > 2)? combination(size, 2) : 1;
+			num_combinations += (size > 2)? Util.combination(size, 2) : 1;
 		}
-		long max_combinations = (num_objects > 2)? combination(num_objects, 2) : ((num_objects == 0)? 0 : 1);
+		long max_combinations = (num_objects > 2)? Util.combination(num_objects, 2) : ((num_objects == 0)? 0 : 1);
 		//
 		FontMetrics metrics = g2d.getFontMetrics();
 		g2d.setColor(Color.YELLOW);
@@ -45,35 +47,5 @@ public class RdcRenderComponent {
 		g2d.drawString("combinations=" + num_combinations + " / " + max_combinations + " (" + rate + "%)", 0, 3 * metrics.getHeight() + metrics.getAscent());
 
 		g2d.setColor(old);
-	}
-
-	/**
-	 * 順列
-	 * @param	n
-	 * @param	r
-	 * @return	nPr = n! / (n-r)!
-	 */
-	private static long permutation(int n, int r){
-		assert((n >= 0) && (r >= 0) && (n >= r));
-		long npr = 1;
-		for(int i = 0; i < r; i++){
-			npr = npr * (n - i);
-		}
-		return npr;
-	}
-
-	/**
-	 * 組合せ
-	 * @param	n
-	 * @param	r
-	 * @return	nCr = nPr / r!
-	 */
-	private static long combination(int n, int r){
-		assert((n >= 0) && (r >= 0) && (n >= r));
-		long ncr = 1;
-		for(int i = 1; i <= r; i++){
-			ncr = ncr * (n - i + 1) / i;
-		}
-		return ncr;
 	}
 }

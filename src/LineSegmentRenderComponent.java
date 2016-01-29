@@ -14,7 +14,7 @@ import jp.gr.java_conf.hasenpfote.framework.GameSystem;
  *
  * @author Hasenpfote
  */
-public class LineSegmentRenderComponent {
+public class LineSegmentRenderComponent{
 
 	public void update(Point2D.Double s, Point2D.Double e, Graphics2D g2d){
 		//
@@ -26,5 +26,4 @@ public class LineSegmentRenderComponent {
 		wtos.transform(e, _e);
 		g2d.drawLine((int)_s.x, (int)_s.y, (int)_e.x, (int)_e.y);
 	}
-
 }

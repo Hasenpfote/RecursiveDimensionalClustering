@@ -1,6 +1,7 @@
 
 import java.awt.Graphics2D;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
+import jp.gr.java_conf.hasenpfote.math.Vector2d;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,15 +15,15 @@ import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
  */
 public class CircularPlate {
 
-	public double px, py;
-	public double vx, vy;
-	public double r;
-	public double m, inv_m;
-	public double fx, fy;
-
 	private CircularPlateInputComponent ic = null;
 	private CircularPlatePhysicsComponent pc = null;
 	private CircularPlateRenderComponent rc = null;
+
+	private final Vector2d position = new Vector2d();
+	private final Vector2d linear_velocity = new Vector2d();
+	private final Vector2d force = new Vector2d();
+	private double mass, inv_mass;
+	private double radius;
 
 	public CircularPlate(CircularPlateInputComponent ic,
 						 CircularPlatePhysicsComponent pc,
@@ -47,4 +48,36 @@ public class CircularPlate {
 			rc.update(this, g2d);
 	}
 
+	public Vector2d getPosition(){
+		return position;
+	}
+
+	public Vector2d getLinearVelocity(){
+		return linear_velocity;
+	}
+
+	public Vector2d getForce(){
+		return force;
+	}
+
+	public double getMass(){
+		return mass;
+	}
+
+	public void setMass(double mass){
+		this.mass = mass;
+		inv_mass = 1.0 / mass;
+	}
+
+	public double getInvMass(){
+		return inv_mass;
+	}
+
+	public double getRadius(){
+		return radius;
+	}
+
+	public void setRadius(double radius){
+		this.radius = radius;
+	}
 }

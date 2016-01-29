@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Random;
 
+import jp.gr.java_conf.hasenpfote.Vector2dPool;
 import jp.gr.java_conf.hasenpfote.framework.GameEngine;
 import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
 import jp.gr.java_conf.hasenpfote.framework.MouseInput;
+import jp.gr.java_conf.hasenpfote.math.Vector2d;
 
 
 public final class SampleGameEngine extends GameEngine{
@@ -97,13 +99,12 @@ public final class SampleGameEngine extends GameEngine{
 
 		for(int i = 0; i < NUM_OBJECTS; i++){
 			CircularPlate cp = new CircularPlate(cp_ip, cp_pc, cp_rc);
-			cp.px = (rnd.nextDouble() - 0.5) * wall_width;
-			cp.py = (rnd.nextDouble() - 0.5) * wall_height;
-			cp.vx = (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0;
-			cp.vy = (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0;
-			cp.r = rnd.nextDouble() * 0.5 + 0.5;
-			cp.m = Math.PI * cp.r * cp.r;
-			cp.inv_m = 1.0 / cp.m;
+			cp.getPosition().set((rnd.nextDouble() - 0.5) * wall_width,
+								 (rnd.nextDouble() - 0.5) * wall_height);
+			cp.getLinearVelocity().set((rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0,
+									   (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0);
+			cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
+			cp.setMass(Math.PI * cp.getRadius() * cp.getRadius());
 
 			objects.add(cp);
 		}
@@ -142,10 +143,17 @@ public final class SampleGameEngine extends GameEngine{
 	 * @param v2	剛体2の速度
 	 * @return 力積
 	 */
-	double calcImpulse(double e, double m1, double m2, double v1, double v2){
+	private double calcImpulse(double e, double m1, double m2, double v1, double v2){
 		double I = (1.0 + e) * (m1 * m2) / (m1 + m2) * (v2 - v1);
 		return I;
 	}
+
+	private void calcImpulse(Vector2d impulse, double e, double m1, double m2, Vector2d v1, Vector2d v2){
+		impulse.sub(v2, v1);
+		impulse.mul((1.0 + e) * (m1 * m2) / (m1 + m2));
+	}
+
+	private final Vector2dPool vector2d_pool = new Vector2dPool();
 
 	@Override
 	protected void updateFrame(double dt){
@@ -156,45 +164,59 @@ public final class SampleGameEngine extends GameEngine{
 
 		double e = 0.25;	// 反発係数
 		double m = 1000.0;
+		Vector2d linear_acceleration = vector2d_pool.allocate();
+		Vector2d impulse = vector2d_pool.allocate();
 
 		for(CircularPlate cp : objects){
 			//cp.updatePhysicsComponent(dt);
-
+			double inv_mass = cp.getInvMass();
 			// acceleration
-			double ax = cp.fx * cp.inv_m;
-			double ay = cp.fy * cp.inv_m - G;
+			Vector2d force = cp.getForce();
+			linear_acceleration.mul(force, inv_mass);
+			linear_acceleration.y -= G;
 			// velocity
-			cp.vx += ax * dt;
-			cp.vy += ay * dt;
+			Vector2d linear_velocity = cp.getLinearVelocity();
+			linear_velocity.madd(linear_acceleration, dt);
 			// position
-			cp.px += cp.vx * dt;
-			cp.py += cp.vy * dt;
+			Vector2d position = cp.getPosition();
+			position.madd(linear_velocity, dt);
 
-			// collison for wall
-			if(cp.px < (wall_min.x + cp.r)){
-				cp.px = wall_min.x + cp.r;
-				double I = calcImpulse(e, cp.m, m, cp.vx, 0.0);
-				cp.vx += I * cp.inv_m;
+			// collision for wall
+			double radius = cp.getRadius();
+			double mass = cp.getMass();
+			if(position.x < (wall_min.x + radius)){
+				position.x = wall_min.x + radius;
+				double I = calcImpulse(e, mass, m, linear_velocity.x, 0.0);
+				linear_velocity.x += I * inv_mass;
+				//calcImpulse(impulse, e, mass, m, linear_velocity, Vector2d.ZERO);
+				//linear_velocity.madd(impulse, inv_mass);
 			}
-			if(cp.px > (wall_max.x - cp.r)){
-				cp.px = wall_max.x - cp.r;
-				double I = calcImpulse(e, cp.m, m, cp.vx, 0.0);
-				cp.vx += I * cp.inv_m;
+			if(position.x > (wall_max.x - radius)){
+				position.x = wall_max.x - radius;
+				double I = calcImpulse(e, mass, m, linear_velocity.x, 0.0);
+				linear_velocity.x += I * inv_mass;
+				//calcImpulse(impulse, e, mass, m, linear_velocity, Vector2d.ZERO);
+				//linear_velocity.madd(impulse, inv_mass);
 			}
-			if(cp.py < (wall_min.y + cp.r)){
-				cp.py = wall_min.y + cp.r;
-				double I = calcImpulse(e, cp.m, m, cp.vy, 0.0);
-				cp.vy += I * cp.inv_m;
+			if(position.y < (wall_min.y + radius)){
+				position.y = wall_min.y + radius;
+				double I = calcImpulse(e, mass, m, linear_velocity.y, 0.0);
+				linear_velocity.y += I * inv_mass;
+				//calcImpulse(impulse, e, mass, m, linear_velocity, Vector2d.ZERO);
+				//linear_velocity.madd(impulse, inv_mass);
 			}
-			if(cp.py > (wall_max.y - cp.r)){
-				cp.py = wall_max.y - cp.r;
-				double I = calcImpulse(e, cp.m, m, cp.vy, 0.0);
-				cp.vy += I * cp.inv_m;
+			if(position.y > (wall_max.y - radius)){
+				position.y = wall_max.y - radius;
+				double I = calcImpulse(e, mass, m, linear_velocity.y, 0.0);
+				linear_velocity.y += I * inv_mass;
+				//calcImpulse(impulse, e, mass, m, linear_velocity, Vector2d.ZERO);
+				//linear_velocity.madd(impulse, inv_mass);
 			}
-
 			// clear force
-			cp.fx = cp.fy = 0.0;
+			force.set(Vector2d.ZERO);
 		}
+		vector2d_pool.release(linear_acceleration);
+		vector2d_pool.release(impulse);
 	}
 
 	@Override

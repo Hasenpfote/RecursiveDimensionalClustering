@@ -24,5 +24,4 @@ public class BoundingBox {
 
 	public Point2D.Double getMin(){ return min; }
 	public Point2D.Double getMax(){ return max; }
-
 }

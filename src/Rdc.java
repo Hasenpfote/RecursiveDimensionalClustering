@@ -3,6 +3,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
+import jp.gr.java_conf.hasenpfote.math.Vector2d;
 
 
 /**
@@ -80,7 +81,7 @@ public final class Rdc{
 					e = x_axis_open_entities.get(object);
 				}
 				else{
-					double x = object.px - object.r;
+					double x = object.getPosition().x - object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.OPEN,  x + CONTACT_THRESHOLD);
 					x_axis_open_entities.put(object, e);
@@ -91,7 +92,7 @@ public final class Rdc{
 					e = x_axis_close_entities.get(object);
 				}
 				else{
-					double x = object.px + object.r;
+					double x = object.getPosition().x + object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.CLOSE, x - CONTACT_THRESHOLD);
 					x_axis_close_entities.put(object, e);
@@ -106,7 +107,7 @@ public final class Rdc{
 					e = y_axis_open_entities.get(object);
 				}
 				else{
-					double y = object.py - object.r;
+					double y = object.getPosition().y - object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.OPEN,  y + CONTACT_THRESHOLD);
 					y_axis_open_entities.put(object, e);
@@ -117,7 +118,7 @@ public final class Rdc{
 					e = y_axis_close_entities.get(object);
 				}
 				else{
-					double y = object.py + object.r;
+					double y = object.getPosition().y + object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.CLOSE, y - CONTACT_THRESHOLD);
 					y_axis_close_entities.put(object, e);
@@ -291,29 +292,34 @@ public final class Rdc{
 
 		public void updateBoundingBox(){
 			CircularPlate object = group.get(0);
-			double min_x = object.px - object.r;
-			double min_y = object.py - object.r;
-			double max_x = object.px + object.r;
-			double max_y = object.py + object.r;
+
+			Vector2d position = object.getPosition();
+			double radius = object.getRadius();
+			double min_x = position.x - radius;
+			double min_y = position.y - radius;
+			double max_x = position.x + radius;
+			double max_y = position.y + radius;
 			double value;
 
 			int size = group.size();
 			for(int i = 1; i < size; i++){
 				object = group.get(i);
+				position = object.getPosition();
+				radius = object.getRadius();
 
-				value = object.px - object.r;
+				value = position.x - radius;
 				if(value < min_x){
 					min_x = value;
 				}
-				value = object.py - object.r;
+				value = position.y - radius;
 				if(value < min_y){
 					min_y = value;
 				}
-				value = object.px + object.r;
+				value = position.x + radius;
 				if(value > max_x){
 					max_x = value;
 				}
-				value = object.py + object.r;
+				value = position.y + radius;
 				if(value > max_y){
 					max_y = value;
 				}

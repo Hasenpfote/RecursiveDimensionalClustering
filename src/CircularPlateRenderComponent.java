@@ -26,12 +26,11 @@ public class CircularPlateRenderComponent{
 		g2d.setStroke(bs);
 		AffineTransform old = g2d.getTransform();
 		g2d.setTransform(GameSystem.getInstance().getWorldToScreenMatrix());
-		g2d.translate(circle.px, circle.py);
-		g2d.scale(circle.r, circle.r);
+		g2d.translate(circle.getPosition().x, circle.getPosition().y);
+		g2d.scale(circle.getRadius(), circle.getRadius());
 		g2d.drawOval(-1, -1, 2, 2);
 		g2d.drawLine(0, 0, 1, 0);
 		g2d.setTransform(old);
 		g2d.setStroke(olds);
 	}
-
 }
