@@ -46,7 +46,7 @@ public final class SampleGameEngine extends GameEngine{
 
 	private static final double G = 9.80665;
 
-	private static final int NUM_OBJECTS = 10;
+	private static final int NUM_OBJECTS = 2;
 	private final ArrayList<CircularPlate> objects = new ArrayList<>();
 
 	private Point2D.Double wall_min = null;
@@ -103,7 +103,8 @@ public final class SampleGameEngine extends GameEngine{
 								 (rnd.nextDouble() - 0.5) * wall_height);
 			cp.getLinearVelocity().set((rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0,
 									   (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0);
-			cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
+			//cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
+			cp.setRadius(1.0);
 			cp.setMass(Math.PI * cp.getRadius() * cp.getRadius());
 
 			objects.add(cp);
@@ -160,15 +161,25 @@ public final class SampleGameEngine extends GameEngine{
 		impulse.mul(n, c);				// I = cN
 	}
 
+	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2, double cdd){
+		impulse.sub(v2, v1);			//	relative velocity
+		double d = impulse.inner(n);	//	v12・N
+		double c = ((m1 * m2) / (m1 + m2)) * ((1.0 + e) * d - cdd);
+		impulse.mul(n, c);				// I = cN
+	}
+
+
+
 	private final Vector2dPool vector2d_pool = new Vector2dPool();
 	private final CollisionPairPool cpair_pool = new CollisionPairPool(100);
-	private final ArrayList<CollisionPair> cpairs = new ArrayList<CollisionPair>(100);
+	private final ArrayList<CollisionPair> cpairs = new ArrayList<>(100);
 
 	@Override
 	protected void updateFrame(double dt){
 		if(pause)
 			return;
 
+		// recursive dimensional clustering
 		rdc.recursiveClustering(objects);
 
 		// collision detection
@@ -186,7 +197,8 @@ public final class SampleGameEngine extends GameEngine{
 					double radius2 = second.getRadius();
 
 					temp.sub(first.getPosition(), second.getPosition());
-					if(temp.length_squared() <= (radius1 * radius1 + radius2 * radius2)){
+
+					if(temp.length_squared() <= (radius1 + radius2) * (radius1 + radius2)){
 						CollisionPair cpair = cpair_pool.allocate();
 						cpair.set(first, second);
 						cpairs.add(cpair);
@@ -196,28 +208,93 @@ public final class SampleGameEngine extends GameEngine{
 		}
 		vector2d_pool.release(temp);
 
-		Vector2d imp = vector2d_pool.allocate();
-		Vector2d nor = vector2d_pool.allocate();
+		Vector2d impulse = vector2d_pool.allocate();
+		Vector2d normal = vector2d_pool.allocate();
 
 		for(CollisionPair cpair : cpairs){
 			CircularPlate first = cpair.getFirst();
 			CircularPlate second = cpair.getSecond();
 
-			nor.sub(second.getPosition(), first.getPosition());
-			nor.normalize();
-			calcImpulse(imp, nor, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
-			first.getLinearVelocity().madd(imp, first.getInvMass());
-			second.getLinearVelocity().msub(imp, second.getInvMass());
+			normal.sub(second.getPosition(), first.getPosition());
+			normal.normalize();
+			calcImpulse(impulse, normal, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
+		/*
+			normal.sub(second.getPosition(), first.getPosition());
+			double d = (first.getRadius() + second.getRadius()) - normal.length();
+			System.out.println("d = " + d);
+			d = -d;
+			normal.normalize();
+			double cd = 0.001;
+			calcImpulse(impulse, normal, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd * d);
+		*/
+			first.getLinearVelocity().madd(impulse, first.getInvMass());
+			second.getLinearVelocity().msub(impulse, second.getInvMass());
 
 			cpair_pool.release(cpair);
 		}
 		cpairs.clear();
 
-		vector2d_pool.release(imp);
-		vector2d_pool.release(nor);
+		//
+		double e = 0.25;	// 反発係数
+		double mass = 1000.0;
+		for(CircularPlate cp : objects) {
+			Vector2d position = cp.getPosition();
+			double radius = cp.getRadius();
+
+			if(position.x <= (wall_min.x + radius)){
+				position.x = wall_min.x + radius;
+				Vector2d linear_velocity = cp.getLinearVelocity();
+				normal.negate(Vector2d.E1);
+				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				linear_velocity.madd(impulse, cp.getInvMass());
+			}else if(position.x >= (wall_max.x - radius)){
+				position.x = wall_max.x - radius;
+				Vector2d linear_velocity = cp.getLinearVelocity();
+				normal.set(Vector2d.E1);
+				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				linear_velocity.madd(impulse, cp.getInvMass());
+			}
+			if(position.y <= (wall_min.y + radius)){
+				position.y = wall_min.y + radius;
+				Vector2d linear_velocity = cp.getLinearVelocity();
+				normal.negate(Vector2d.E2);
+				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				linear_velocity.madd(impulse, cp.getInvMass());
+			}else if(position.y >= (wall_max.y - radius)){
+				position.y = wall_max.y - radius;
+				Vector2d linear_velocity = cp.getLinearVelocity();
+				normal.set(Vector2d.E2);
+				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				linear_velocity.madd(impulse, cp.getInvMass());
+			}
+		}
+
+		vector2d_pool.release(impulse);
+		vector2d_pool.release(normal);
+
+		//
+		Vector2d linear_acceleration = vector2d_pool.allocate();
+		for(CircularPlate cp : objects) {
+			double inv_mass = cp.getInvMass();
+			// acceleration
+			Vector2d force = cp.getForce();
+			linear_acceleration.mul(force, inv_mass);
+			linear_acceleration.y -= G;
+			// velocity
+			Vector2d linear_velocity = cp.getLinearVelocity();
+			linear_velocity.madd(linear_acceleration, dt);
+			// position
+			Vector2d position = cp.getPosition();
+			position.madd(linear_velocity, dt);
+			// clear force
+			force.set(Vector2d.ZERO);
+		}
+
+		vector2d_pool.release(linear_acceleration);
+
 
 		/////
-
+/*
 		double e = 0.25;	// 反発係数
 		double m = 1000.0;
 		Vector2d linear_acceleration = vector2d_pool.allocate();
@@ -273,6 +350,7 @@ public final class SampleGameEngine extends GameEngine{
 		}
 		vector2d_pool.release(linear_acceleration);
 		vector2d_pool.release(impulse);
+*/
 	}
 
 	@Override
