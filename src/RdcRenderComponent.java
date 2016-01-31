@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * RDC のデバッグ用描画コンポーネント
  * @author Hasenpfote
  */
-public class RdcRenderComponent {
+public class RdcRenderComponent{
 
 	private static final BoundingBoxRenderComponent bbox_rc = new BoundingBoxRenderComponent();
 
@@ -26,13 +26,13 @@ public class RdcRenderComponent {
 		Color old = g2d.getColor();
 		g2d.setColor(Color.GREEN);
 		for(Rdc.Cluster cluster : clusters){
-			bbox_rc.update(cluster.bbox, g2d);
+			bbox_rc.update(cluster.getBoundingBox(), g2d);
 		}
 		//
 		long num_combinations = 0;
 		int num_objects = 0;
 		for(Rdc.Cluster cluster : clusters){
-			int size = cluster.group.size();
+			int size = cluster.getGroup().size();
 			num_objects += size;
 			num_combinations += (size > 2)? Util.combination(size, 2) : 1;
 		}

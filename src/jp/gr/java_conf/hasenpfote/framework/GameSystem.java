@@ -11,7 +11,7 @@ import java.awt.geom.AffineTransform;
  *
  * @author Hasenpfote
  */
-public class GameSystem {
+public class GameSystem{
 
 	private static class LazyHolder{
 		private static final GameSystem INSTANCE = new GameSystem();

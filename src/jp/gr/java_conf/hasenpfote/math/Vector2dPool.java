@@ -1,4 +1,4 @@
-package jp.gr.java_conf.hasenpfote;
+package jp.gr.java_conf.hasenpfote.math;
 
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
 import jp.gr.java_conf.hasenpfote.math.Vector2d;
@@ -6,7 +6,7 @@ import jp.gr.java_conf.hasenpfote.math.Vector2d;
 /**
  * Created by Hasenpfote on 2016/01/29.
  */
-public class Vector2dPool extends ObjectPool<Vector2d> {
+public class Vector2dPool extends ObjectPool<Vector2d>{
 
 	public Vector2dPool(){
 		super();

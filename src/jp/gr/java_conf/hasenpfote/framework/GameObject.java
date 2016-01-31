@@ -9,7 +9,7 @@ package jp.gr.java_conf.hasenpfote.framework;
  *
  * @author Hasenpfote
  */
-public class GameObject {
+public class GameObject{
 
 	public double px, py;
 	public double vx, vy;

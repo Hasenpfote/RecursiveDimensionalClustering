@@ -8,7 +8,7 @@
  *
  * @author Hasenpfote
  */
-public class CircularPlatePhysicsComponent {
+public class CircularPlatePhysicsComponent{
 
 	public void update(CircularPlate circle, double dt){
 /*
@@ -24,5 +24,4 @@ public class CircularPlatePhysicsComponent {
 		circle.fx = circle.fy = 0.0;
 */
 	}
-
 }

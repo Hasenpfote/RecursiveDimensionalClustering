@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 簡易オブジェクトプール.
  * @author Hasenpfote
  */
-public abstract class ObjectPool<T> {
+public abstract class ObjectPool<T>{
 	private static final int DEFAULT_CAPACITY = 32;
 	private final ArrayList<T> objects;
 	private final int capacity;

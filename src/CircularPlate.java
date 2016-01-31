@@ -13,7 +13,7 @@ import jp.gr.java_conf.hasenpfote.math.Vector2d;
  *
  * @author Hasenpfote
  */
-public class CircularPlate {
+public class CircularPlate{
 
 	private CircularPlateInputComponent ic = null;
 	private CircularPlatePhysicsComponent pc = null;

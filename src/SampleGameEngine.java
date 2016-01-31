@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Random;
 
-import jp.gr.java_conf.hasenpfote.Vector2dPool;
+import jp.gr.java_conf.hasenpfote.math.Vector2dPool;
 import jp.gr.java_conf.hasenpfote.framework.GameEngine;
 import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
@@ -153,7 +153,16 @@ public final class SampleGameEngine extends GameEngine{
 		impulse.mul((1.0 + e) * (m1 * m2) / (m1 + m2));
 	}
 
+	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2){
+		impulse.sub(v2, v1);			//	relative velocity
+		double d = impulse.inner(n);	//	v12・N
+		double c = (1.0 + e) * (m1 * m2) / (m1 + m2) * d;
+		impulse.mul(n, c);				// I = cN
+	}
+
 	private final Vector2dPool vector2d_pool = new Vector2dPool();
+	private final CollisionPairPool cpair_pool = new CollisionPairPool(100);
+	private final ArrayList<CollisionPair> cpairs = new ArrayList<CollisionPair>(100);
 
 	@Override
 	protected void updateFrame(double dt){
@@ -161,6 +170,53 @@ public final class SampleGameEngine extends GameEngine{
 			return;
 
 		rdc.recursiveClustering(objects);
+
+		// collision detection
+		Vector2d temp = vector2d_pool.allocate();
+		ArrayList<Rdc.Cluster> clusters = rdc.getClusters();
+		for(Rdc.Cluster cluster : clusters){
+			ArrayList<CircularPlate> group = cluster.getGroup();
+			// brute force
+			int size = group.size();
+			for(int i = 0; i < (size-1); i++){
+				CircularPlate first = group.get(i);
+				double radius1 = first.getRadius();
+				for(int j = (i+1); j < size; j++){
+					CircularPlate second = group.get(j);
+					double radius2 = second.getRadius();
+
+					temp.sub(first.getPosition(), second.getPosition());
+					if(temp.length_squared() <= (radius1 * radius1 + radius2 * radius2)){
+						CollisionPair cpair = cpair_pool.allocate();
+						cpair.set(first, second);
+						cpairs.add(cpair);
+					}
+				}
+			}
+		}
+		vector2d_pool.release(temp);
+
+		Vector2d imp = vector2d_pool.allocate();
+		Vector2d nor = vector2d_pool.allocate();
+
+		for(CollisionPair cpair : cpairs){
+			CircularPlate first = cpair.getFirst();
+			CircularPlate second = cpair.getSecond();
+
+			nor.sub(second.getPosition(), first.getPosition());
+			nor.normalize();
+			calcImpulse(imp, nor, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
+			first.getLinearVelocity().madd(imp, first.getInvMass());
+			second.getLinearVelocity().msub(imp, second.getInvMass());
+
+			cpair_pool.release(cpair);
+		}
+		cpairs.clear();
+
+		vector2d_pool.release(imp);
+		vector2d_pool.release(nor);
+
+		/////
 
 		double e = 0.25;	// 反発係数
 		double m = 1000.0;

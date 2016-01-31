@@ -14,7 +14,7 @@ import jp.gr.java_conf.hasenpfote.framework.GameSystem;
  *
  * @author Hasenpfote
  */
-public class BoundingBoxRenderComponent {
+public class BoundingBoxRenderComponent{
 
 	public void update(BoundingBox box, Graphics2D g2d){
 		//

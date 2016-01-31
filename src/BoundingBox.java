@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
  *
  * @author Hasenpfote
  */
-public class BoundingBox {
+public class BoundingBox{
 
 	private Point2D.Double min;
 	private Point2D.Double max;

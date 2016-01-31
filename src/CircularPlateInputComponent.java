@@ -14,7 +14,7 @@ import jp.gr.java_conf.hasenpfote.math.Vector2d;
  *
  * @author Hasenpfote
  */
-public class CircularPlateInputComponent {
+public class CircularPlateInputComponent{
 
 	public void update(CircularPlate circle, KeyboardInput key){
 		if(key.isKeyDown(KeyEvent.VK_UP)){

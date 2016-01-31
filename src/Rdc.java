@@ -270,25 +270,18 @@ public final class Rdc{
 	/**
 	 *
 	 */
-	/*
-	public class CollisionPair{
-		public CircularPlate first;
-		public CircularPlate second;
-
-		public CollisionPair(CircularPlate first, CircularPlate second){
-			this.first = first;
-			this.second = second;
-		}
-	}
-	*/
-
-	/**
-	 *
-	 */
 	public class Cluster{
 
-		public BoundingBox bbox = new BoundingBox();
-		public ArrayList<CircularPlate> group = new ArrayList<>();
+		private BoundingBox bbox = new BoundingBox();
+		private ArrayList<CircularPlate> group = new ArrayList<>();
+
+		public BoundingBox getBoundingBox(){
+			return bbox;
+		}
+
+		public ArrayList<CircularPlate> getGroup(){
+			return group;
+		}
 
 		public void updateBoundingBox(){
 			CircularPlate object = group.get(0);
