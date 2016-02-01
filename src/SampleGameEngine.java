@@ -46,7 +46,7 @@ public final class SampleGameEngine extends GameEngine{
 
 	private static final double G = 9.80665;
 
-	private static final int NUM_OBJECTS = 2;
+	private static final int NUM_OBJECTS = 50;
 	private final ArrayList<CircularPlate> objects = new ArrayList<>();
 
 	private Point2D.Double wall_min = null;
@@ -103,8 +103,7 @@ public final class SampleGameEngine extends GameEngine{
 								 (rnd.nextDouble() - 0.5) * wall_height);
 			cp.getLinearVelocity().set((rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0,
 									   (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0);
-			//cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
-			cp.setRadius(1.0);
+			cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
 			cp.setMass(Math.PI * cp.getRadius() * cp.getRadius());
 
 			objects.add(cp);
@@ -130,6 +129,39 @@ public final class SampleGameEngine extends GameEngine{
 		if(keyboard.isKeyDownOnce(KeyEvent.VK_F1))
 			debug = !debug;
 
+		//
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F2)){
+			double wall_width = wall_max.x - wall_min.x;
+			double wall_height = wall_max.y - wall_min.y;
+			for(CircularPlate cp : objects){
+				cp.getPosition().set(0.0, (rnd.nextDouble() - 0.5) * wall_height);
+				cp.getLinearVelocity().set(0.0, 0.0);
+				//cp.getPosition().set((rnd.nextDouble() - 0.5) * wall_width, (rnd.nextDouble() - 0.5) * wall_height);
+			}
+		}
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F3)){
+			double wall_width = wall_max.x - wall_min.x;
+			double wall_height = wall_max.y - wall_min.y;
+			CircularPlate cp = objects.get(0);
+			cp.getPosition().set(-wall_width * 0.5, 0.0);
+			cp.getLinearVelocity().set(100.0, 0.0);
+
+			cp = objects.get(1);
+			cp.getPosition().set(wall_width * 0.5, 0.0);
+			cp.getLinearVelocity().set(-100.0, 0.0);
+		}
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F4)){
+			double wall_width = wall_max.x - wall_min.x;
+			double wall_height = wall_max.y - wall_min.y;
+			CircularPlate cp = objects.get(0);
+			cp.getPosition().set(0.0, wall_height * 0.5);
+			cp.getLinearVelocity().set(0.0,-100.0);
+
+			cp = objects.get(1);
+			cp.getPosition().set(0.0, -wall_height * 0.5);
+			cp.getLinearVelocity().set(0.0, 0.0);
+		}
+		//
 		for(CircularPlate cp : objects){
 			cp.updateInputComponent(keyboard);
 		}
@@ -156,34 +188,36 @@ public final class SampleGameEngine extends GameEngine{
 
 	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2){
 		impulse.sub(v2, v1);			//	relative velocity
-		double d = impulse.inner(n);	//	v12・N
-		double c = (1.0 + e) * (m1 * m2) / (m1 + m2) * d;
+		double i = impulse.inner(n);	//	v12・N
+		double c = ((m1 * m2) / (m1 + m2)) * (1.0 + e) * i;
 		impulse.mul(n, c);				// I = cN
 	}
 
-	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2, double cdd){
+	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2, double cd, double d){
 		impulse.sub(v2, v1);			//	relative velocity
-		double d = impulse.inner(n);	//	v12・N
-		double c = ((m1 * m2) / (m1 + m2)) * ((1.0 + e) * d - cdd);
+		double i = impulse.inner(n);	//	v12・N
+		double c = ((m1 * m2) / (m1 + m2)) * ((1.0 + e) * i - cd * d);
 		impulse.mul(n, c);				// I = cN
 	}
-
 
 
 	private final Vector2dPool vector2d_pool = new Vector2dPool();
-	private final CollisionPairPool cpair_pool = new CollisionPairPool(100);
-	private final ArrayList<CollisionPair> cpairs = new ArrayList<>(100);
+	private final CollisionPairPool cpair_pool = new CollisionPairPool(1000);
+	private final ArrayList<CollisionPair> cpairs = new ArrayList<>(1000);
 
 	@Override
 	protected void updateFrame(double dt){
 		if(pause)
 			return;
 
+		final double cd = 1.0 / dt * 0.5;	// 0 < cd < 1/Δt
+
 		// recursive dimensional clustering
 		rdc.recursiveClustering(objects);
 
 		// collision detection
 		Vector2d temp = vector2d_pool.allocate();
+		Vector2d rv = vector2d_pool.allocate();
 		ArrayList<Rdc.Cluster> clusters = rdc.getClusters();
 		for(Rdc.Cluster cluster : clusters){
 			ArrayList<CircularPlate> group = cluster.getGroup();
@@ -196,8 +230,12 @@ public final class SampleGameEngine extends GameEngine{
 					CircularPlate second = group.get(j);
 					double radius2 = second.getRadius();
 
-					temp.sub(first.getPosition(), second.getPosition());
-
+					temp.sub(second.getPosition(), first.getPosition());
+					//
+					rv.sub(second.getLinearVelocity(), first.getLinearVelocity());
+					if(temp.inner(rv) >= 0.0)
+						continue;
+					//
 					if(temp.length_squared() <= (radius1 + radius2) * (radius1 + radius2)){
 						CollisionPair cpair = cpair_pool.allocate();
 						cpair.set(first, second);
@@ -214,19 +252,17 @@ public final class SampleGameEngine extends GameEngine{
 		for(CollisionPair cpair : cpairs){
 			CircularPlate first = cpair.getFirst();
 			CircularPlate second = cpair.getSecond();
-
-			normal.sub(second.getPosition(), first.getPosition());
-			normal.normalize();
-			calcImpulse(impulse, normal, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
 		/*
 			normal.sub(second.getPosition(), first.getPosition());
-			double d = (first.getRadius() + second.getRadius()) - normal.length();
-			System.out.println("d = " + d);
-			d = -d;
 			normal.normalize();
-			double cd = 0.001;
-			calcImpulse(impulse, normal, 1.0, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd * d);
+			calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
 		*/
+		//////
+			normal.sub(second.getPosition(), first.getPosition());
+			double d = (first.getRadius() + second.getRadius()) - normal.length();
+			normal.normalize();
+			calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd, d);
+		//////
 			first.getLinearVelocity().madd(impulse, first.getInvMass());
 			second.getLinearVelocity().msub(impulse, second.getInvMass());
 
@@ -235,7 +271,7 @@ public final class SampleGameEngine extends GameEngine{
 		cpairs.clear();
 
 		//
-		double e = 0.25;	// 反発係数
+		double e = 0.5;	// 反発係数
 		double mass = 1000.0;
 		for(CircularPlate cp : objects) {
 			Vector2d position = cp.getPosition();
@@ -271,6 +307,7 @@ public final class SampleGameEngine extends GameEngine{
 
 		vector2d_pool.release(impulse);
 		vector2d_pool.release(normal);
+		vector2d_pool.release(rv);
 
 		//
 		Vector2d linear_acceleration = vector2d_pool.allocate();
