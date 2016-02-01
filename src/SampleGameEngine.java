@@ -231,7 +231,7 @@ public final class SampleGameEngine extends GameEngine{
 					double radius2 = second.getRadius();
 
 					temp.sub(second.getPosition(), first.getPosition());
-					//
+					// Option
 					rv.sub(second.getLinearVelocity(), first.getLinearVelocity());
 					if(temp.inner(rv) >= 0.0)
 						continue;
@@ -252,17 +252,12 @@ public final class SampleGameEngine extends GameEngine{
 		for(CollisionPair cpair : cpairs){
 			CircularPlate first = cpair.getFirst();
 			CircularPlate second = cpair.getSecond();
-		/*
-			normal.sub(second.getPosition(), first.getPosition());
-			normal.normalize();
-			calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity());
-		*/
-		//////
+
 			normal.sub(second.getPosition(), first.getPosition());
 			double d = (first.getRadius() + second.getRadius()) - normal.length();
 			normal.normalize();
 			calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd, d);
-		//////
+
 			first.getLinearVelocity().madd(impulse, first.getInvMass());
 			second.getLinearVelocity().msub(impulse, second.getInvMass());
 
@@ -309,7 +304,7 @@ public final class SampleGameEngine extends GameEngine{
 		vector2d_pool.release(normal);
 		vector2d_pool.release(rv);
 
-		//
+		// Integrate
 		Vector2d linear_acceleration = vector2d_pool.allocate();
 		for(CircularPlate cp : objects) {
 			double inv_mass = cp.getInvMass();

@@ -22,7 +22,7 @@ import jp.gr.java_conf.hasenpfote.math.Vector2d;
  */
 public class CircularPlateRenderComponent{
 
-	private static final BasicStroke bs = new BasicStroke(0.01f);
+	private static final BasicStroke bs = new BasicStroke(0.05f);
 
 	public void update(CircularPlate circle, Graphics2D g2d){
 		Stroke olds = g2d.getStroke();
