@@ -239,12 +239,15 @@ public final class Rdc{
 
 		@Override
 		public int compareTo(Entity o) {
+			/*
 			double diff = position - o.position;
 			if(diff < 0.0)
 				return -1;
 			if(diff > 0.0)
 				return 1;
 			return 0;
+			*/
+			return Double.compare(position, o.position);
 		}
 	}
 

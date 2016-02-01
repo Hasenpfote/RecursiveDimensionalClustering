@@ -126,7 +126,7 @@ public abstract class GameEngine implements Runnable{
 			}
 		}
 		catch(Exception e){
-
+			e.printStackTrace();
 		}
 		finally{
 			cleanup();
@@ -218,7 +218,7 @@ public abstract class GameEngine implements Runnable{
 
 	/**
 	 * フレームの描画処理.
-	 * @param g
+	 * @param g2d
 	 */
 	protected abstract void renderFrame(Graphics2D g2d);
 }

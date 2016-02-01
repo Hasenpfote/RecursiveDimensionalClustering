@@ -23,6 +23,7 @@ import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
 import jp.gr.java_conf.hasenpfote.framework.MouseInput;
 import jp.gr.java_conf.hasenpfote.math.Vector2d;
+import jp.gr.java_conf.hasenpfote.physics.Physics;
 
 
 public final class SampleGameEngine extends GameEngine{
@@ -43,8 +44,6 @@ public final class SampleGameEngine extends GameEngine{
 	private MouseInput mouse = null;
 	private boolean pause = false;
 	private boolean debug = true;
-
-	private static final double G = 9.80665;
 
 	private static final int NUM_OBJECTS = 50;
 	private final ArrayList<CircularPlate> objects = new ArrayList<>();
@@ -143,11 +142,11 @@ public final class SampleGameEngine extends GameEngine{
 			double wall_width = wall_max.x - wall_min.x;
 			double wall_height = wall_max.y - wall_min.y;
 			CircularPlate cp = objects.get(0);
-			cp.getPosition().set(-wall_width * 0.5, 0.0);
+			cp.getPosition().set(-wall_width * 0.25, 0.0);
 			cp.getLinearVelocity().set(100.0, 0.0);
 
 			cp = objects.get(1);
-			cp.getPosition().set(wall_width * 0.5, 0.0);
+			cp.getPosition().set(wall_width * 0.25, 0.0);
 			cp.getLinearVelocity().set(-100.0, 0.0);
 		}
 		if(keyboard.isKeyDownOnce(KeyEvent.VK_F4)){
@@ -166,40 +165,6 @@ public final class SampleGameEngine extends GameEngine{
 			cp.updateInputComponent(keyboard);
 		}
 	}
-
-	/**
-	 * 衝突応答
-	 * @param e		反発係数
-	 * @param m1	剛体1の質量
-	 * @param m2	剛体2の質量
-	 * @param v1	剛体1の速度
-	 * @param v2	剛体2の速度
-	 * @return 力積
-	 */
-	private double calcImpulse(double e, double m1, double m2, double v1, double v2){
-		double I = (1.0 + e) * (m1 * m2) / (m1 + m2) * (v2 - v1);
-		return I;
-	}
-
-	private void calcImpulse(Vector2d impulse, double e, double m1, double m2, Vector2d v1, Vector2d v2){
-		impulse.sub(v2, v1);
-		impulse.mul((1.0 + e) * (m1 * m2) / (m1 + m2));
-	}
-
-	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2){
-		impulse.sub(v2, v1);			//	relative velocity
-		double i = impulse.inner(n);	//	v12・N
-		double c = ((m1 * m2) / (m1 + m2)) * (1.0 + e) * i;
-		impulse.mul(n, c);				// I = cN
-	}
-
-	private void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2, double cd, double d){
-		impulse.sub(v2, v1);			//	relative velocity
-		double i = impulse.inner(n);	//	v12・N
-		double c = ((m1 * m2) / (m1 + m2)) * ((1.0 + e) * i - cd * d);
-		impulse.mul(n, c);				// I = cN
-	}
-
 
 	private final Vector2dPool vector2d_pool = new Vector2dPool();
 	private final CollisionPairPool cpair_pool = new CollisionPairPool(1000);
@@ -245,6 +210,7 @@ public final class SampleGameEngine extends GameEngine{
 			}
 		}
 		vector2d_pool.release(temp);
+		vector2d_pool.release(rv);
 
 		Vector2d impulse = vector2d_pool.allocate();
 		Vector2d normal = vector2d_pool.allocate();
@@ -256,7 +222,7 @@ public final class SampleGameEngine extends GameEngine{
 			normal.sub(second.getPosition(), first.getPosition());
 			double d = (first.getRadius() + second.getRadius()) - normal.length();
 			normal.normalize();
-			calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd, d);
+			Physics.calcImpulse(impulse, normal, 0.5, first.getMass(), second.getMass(), first.getLinearVelocity(), second.getLinearVelocity(), cd, d);
 
 			first.getLinearVelocity().madd(impulse, first.getInvMass());
 			second.getLinearVelocity().msub(impulse, second.getInvMass());
@@ -266,43 +232,42 @@ public final class SampleGameEngine extends GameEngine{
 		cpairs.clear();
 
 		//
-		double e = 0.5;	// 反発係数
+		double e = 0.25;	// 反発係数
 		double mass = 1000.0;
 		for(CircularPlate cp : objects) {
 			Vector2d position = cp.getPosition();
 			double radius = cp.getRadius();
 
 			if(position.x <= (wall_min.x + radius)){
-				position.x = wall_min.x + radius;
 				Vector2d linear_velocity = cp.getLinearVelocity();
 				normal.negate(Vector2d.E1);
-				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				double d = radius - Math.abs(position.x - wall_min.x);
+				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
 				linear_velocity.madd(impulse, cp.getInvMass());
 			}else if(position.x >= (wall_max.x - radius)){
-				position.x = wall_max.x - radius;
 				Vector2d linear_velocity = cp.getLinearVelocity();
 				normal.set(Vector2d.E1);
-				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				double d = radius - Math.abs(position.x - wall_max.x);
+				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
 				linear_velocity.madd(impulse, cp.getInvMass());
 			}
 			if(position.y <= (wall_min.y + radius)){
-				position.y = wall_min.y + radius;
 				Vector2d linear_velocity = cp.getLinearVelocity();
 				normal.negate(Vector2d.E2);
-				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				double d = radius - Math.abs(position.y - wall_min.y);
+				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
 				linear_velocity.madd(impulse, cp.getInvMass());
 			}else if(position.y >= (wall_max.y - radius)){
-				position.y = wall_max.y - radius;
 				Vector2d linear_velocity = cp.getLinearVelocity();
 				normal.set(Vector2d.E2);
-				calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO);
+				double d = radius - Math.abs(position.y - wall_max.y);
+				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
 				linear_velocity.madd(impulse, cp.getInvMass());
 			}
 		}
 
 		vector2d_pool.release(impulse);
 		vector2d_pool.release(normal);
-		vector2d_pool.release(rv);
 
 		// Integrate
 		Vector2d linear_acceleration = vector2d_pool.allocate();
@@ -311,7 +276,7 @@ public final class SampleGameEngine extends GameEngine{
 			// acceleration
 			Vector2d force = cp.getForce();
 			linear_acceleration.mul(force, inv_mass);
-			linear_acceleration.y -= G;
+			linear_acceleration.y -= Physics.G;
 			// velocity
 			Vector2d linear_velocity = cp.getLinearVelocity();
 			linear_velocity.madd(linear_acceleration, dt);
