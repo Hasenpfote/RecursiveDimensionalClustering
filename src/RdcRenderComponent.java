@@ -40,11 +40,11 @@ public class RdcRenderComponent{
 		//
 		FontMetrics metrics = g2d.getFontMetrics();
 		g2d.setColor(Color.YELLOW);
-		g2d.drawString("objects=" + num_objects, 0, metrics.getHeight() + metrics.getAscent());
-		g2d.drawString("clusters=" + clusters.size(), 0, 2 * metrics.getHeight() + metrics.getAscent());
+		g2d.drawString("objects=" + num_objects, 0, 2 * metrics.getHeight() + metrics.getAscent());
+		g2d.drawString("clusters=" + clusters.size(), 0, 3 * metrics.getHeight() + metrics.getAscent());
 		//g2d.drawString("collisions=" + pairs.size(), 0, 2 * metrics.getHeight() + metrics.getAscent());
 		int rate = (int)((double)num_combinations / max_combinations * 100);
-		g2d.drawString("combinations=" + num_combinations + " / " + max_combinations + " (" + rate + "%)", 0, 3 * metrics.getHeight() + metrics.getAscent());
+		g2d.drawString("combinations=" + num_combinations + " / " + max_combinations + " (" + rate + "%)", 0, 4 * metrics.getHeight() + metrics.getAscent());
 
 		g2d.setColor(old);
 	}

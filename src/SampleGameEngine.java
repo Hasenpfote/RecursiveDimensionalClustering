@@ -29,7 +29,6 @@ import jp.gr.java_conf.hasenpfote.physics.Physics;
 public final class SampleGameEngine extends GameEngine{
 
 	private static final int DEFAULT_FPS = 60;
-	private static final double PIXELS_PER_METER = 100.0;
 	private static final Font font = new Font(Font.SERIF, Font.BOLD, 18);
 	private static final Random rnd = new Random();
 
@@ -50,6 +49,8 @@ public final class SampleGameEngine extends GameEngine{
 
 	private Point2D.Double wall_min = null;
 	private Point2D.Double wall_max = null;
+
+	private boolean gravity_enabled = false;
 
 	private final Rdc rdc = new Rdc();
 	private static final RdcRenderComponent rdc_rc = new RdcRenderComponent();
@@ -75,7 +76,7 @@ public final class SampleGameEngine extends GameEngine{
 	@Override
 	protected void initialize(){
 		GameSystem.getInstance().setScreenSize(screen_width, screen_height);
-		GameSystem.getInstance().setPixelsPerUnit((int)PIXELS_PER_METER);
+		//GameSystem.getInstance().setPixelsPerUnit((int)PIXELS_PER_METER);
 		GameSystem.getInstance().updateMarix();
 
 		wall_min = new Point2D.Double();
@@ -128,8 +129,11 @@ public final class SampleGameEngine extends GameEngine{
 		if(keyboard.isKeyDownOnce(KeyEvent.VK_F1))
 			debug = !debug;
 
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F2))
+			gravity_enabled = !gravity_enabled;
+
 		//
-		if(keyboard.isKeyDownOnce(KeyEvent.VK_F2)){
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F3)){
 			double wall_width = wall_max.x - wall_min.x;
 			double wall_height = wall_max.y - wall_min.y;
 			for(CircularPlate cp : objects){
@@ -138,7 +142,7 @@ public final class SampleGameEngine extends GameEngine{
 				//cp.getPosition().set((rnd.nextDouble() - 0.5) * wall_width, (rnd.nextDouble() - 0.5) * wall_height);
 			}
 		}
-		if(keyboard.isKeyDownOnce(KeyEvent.VK_F3)){
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_F4)){
 			double wall_width = wall_max.x - wall_min.x;
 			double wall_height = wall_max.y - wall_min.y;
 			CircularPlate cp = objects.get(0);
@@ -148,17 +152,6 @@ public final class SampleGameEngine extends GameEngine{
 			cp = objects.get(1);
 			cp.getPosition().set(wall_width * 0.25, 0.0);
 			cp.getLinearVelocity().set(-100.0, 0.0);
-		}
-		if(keyboard.isKeyDownOnce(KeyEvent.VK_F4)){
-			double wall_width = wall_max.x - wall_min.x;
-			double wall_height = wall_max.y - wall_min.y;
-			CircularPlate cp = objects.get(0);
-			cp.getPosition().set(0.0, wall_height * 0.5);
-			cp.getLinearVelocity().set(0.0,-100.0);
-
-			cp = objects.get(1);
-			cp.getPosition().set(0.0, -wall_height * 0.5);
-			cp.getLinearVelocity().set(0.0, 0.0);
 		}
 		//
 		for(CircularPlate cp : objects){
@@ -270,13 +263,14 @@ public final class SampleGameEngine extends GameEngine{
 		vector2d_pool.release(normal);
 
 		// Integrate
+		double g = (gravity_enabled)? Physics.G : 0.0;
 		Vector2d linear_acceleration = vector2d_pool.allocate();
 		for(CircularPlate cp : objects) {
 			double inv_mass = cp.getInvMass();
 			// acceleration
 			Vector2d force = cp.getForce();
 			linear_acceleration.mul(force, inv_mass);
-			linear_acceleration.y -= Physics.G;
+			linear_acceleration.y -= g;
 			// velocity
 			Vector2d linear_velocity = cp.getLinearVelocity();
 			linear_velocity.madd(linear_acceleration, dt);
@@ -357,6 +351,14 @@ public final class SampleGameEngine extends GameEngine{
 		g2d.setFont(font);
 		// 背景のクリア
 		g2d.clearRect(0, 0, screen_width, screen_height);
+		// FPSの表示
+		FontMetrics metrics = g2d.getFontMetrics();
+		g2d.setColor(Color.YELLOW);
+		String render_fps = String.format("%.2f", getFps());
+		String update_fps = String.format("%.2f", getUps());
+		g2d.drawString("fps : ups =" + render_fps + " : " + update_fps, 0, metrics.getAscent());
+		//g2d.drawString("fps=" + Double.toString(getRenderFps()) + " / " + Double.toString(getUpdateFps()), 0, metrics.getAscent());
+		g2d.drawString("gravity: " + ((gravity_enabled)? "On" : "Off"), 0, metrics.getHeight() + metrics.getAscent());
 		{
 			g2d.setColor(Color.WHITE);
 
@@ -367,12 +369,5 @@ public final class SampleGameEngine extends GameEngine{
 				rdc_rc.update(rdc, g2d);
 			}
 		}
-		// FPSの表示
-		FontMetrics metrics = g2d.getFontMetrics();
-		g2d.setColor(Color.YELLOW);
-		String render_fps = String.format("%.2f", getFps());
-		String update_fps = String.format("%.2f", getUps());
-		g2d.drawString("fps : ups =" + render_fps + " : " + update_fps, 0, metrics.getAscent());
-		//g2d.drawString("fps=" + Double.toString(getRenderFps()) + " / " + Double.toString(getUpdateFps()), 0, metrics.getAscent());
 	}
 }
