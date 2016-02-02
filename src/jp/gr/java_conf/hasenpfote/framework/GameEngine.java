@@ -125,6 +125,8 @@ public abstract class GameEngine implements Runnable{
 				}
 			}
 		}
+		catch(InterruptedException e){
+		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
