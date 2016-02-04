@@ -89,9 +89,8 @@ public final class SampleGameEngine extends GameEngine{
 			wtos.inverseTransform(max, wall_max);
 		}catch(NoninvertibleTransformException e){
 		}
-
-		double wall_width = wall_max.x - wall_min.x;
-		double wall_height = wall_max.y - wall_min.y;
+		double hw = (wall_max.x - wall_min.x) * 0.5;
+		double hh = (wall_max.y - wall_min.y) * 0.5;
 
 		CircularPlateInputComponent cp_ip = new CircularPlateInputComponent();
 		CircularPlatePhysicsComponent cp_pc = new CircularPlatePhysicsComponent();
@@ -99,11 +98,12 @@ public final class SampleGameEngine extends GameEngine{
 
 		for(int i = 0; i < NUM_OBJECTS; i++){
 			CircularPlate cp = new CircularPlate(cp_ip, cp_pc, cp_rc);
-			cp.getPosition().set((rnd.nextDouble() - 0.5) * wall_width,
-								 (rnd.nextDouble() - 0.5) * wall_height);
+			double radius = rnd.nextDouble() * 0.5 + 0.5;
+			cp.setRadius(radius);
+			cp.getPosition().set((rnd.nextDouble() * 2.0 - 1.0) * (hw - radius),
+								 (rnd.nextDouble() * 2.0 - 1.0) * (hh - radius));
 			cp.getLinearVelocity().set((rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0,
 									   (rnd.nextDouble() - 0.5) * 2.0 * 10.0 + 10.0);
-			cp.setRadius(rnd.nextDouble() * 0.5 + 0.5);
 			cp.setMass(Math.PI * cp.getRadius() * cp.getRadius());
 
 			objects.add(cp);
@@ -174,8 +174,9 @@ public final class SampleGameEngine extends GameEngine{
 		rdc.recursiveClustering(objects);
 
 		// collision detection
-		Vector2d temp = vector2d_pool.allocate();
-		Vector2d rv = vector2d_pool.allocate();
+		Vector2d rp = vector2d_pool.allocate();	// relative position
+		Vector2d rv = vector2d_pool.allocate();	// relative velocity
+
 		ArrayList<Rdc.Cluster> clusters = rdc.getClusters();
 		for(Rdc.Cluster cluster : clusters){
 			ArrayList<CircularPlate> group = cluster.getGroup();
@@ -187,14 +188,11 @@ public final class SampleGameEngine extends GameEngine{
 				for(int j = (i+1); j < size; j++){
 					CircularPlate second = group.get(j);
 					double radius2 = second.getRadius();
-
-					temp.sub(second.getPosition(), first.getPosition());
-					// Option
+					rp.sub(second.getPosition(), first.getPosition());
 					rv.sub(second.getLinearVelocity(), first.getLinearVelocity());
-					if(temp.inner(rv) >= 0.0)
+					if(rp.inner(rv) >= 0.0)
 						continue;
-					//
-					if(temp.length_squared() <= (radius1 + radius2) * (radius1 + radius2)){
+					if(rp.length_squared() <= (radius1 + radius2) * (radius1 + radius2)){
 						CollisionPair cpair = cpair_pool.allocate();
 						cpair.set(first, second);
 						cpairs.add(cpair);
@@ -202,8 +200,7 @@ public final class SampleGameEngine extends GameEngine{
 				}
 			}
 		}
-		vector2d_pool.release(temp);
-		vector2d_pool.release(rv);
+		vector2d_pool.release(rp);
 
 		Vector2d impulse = vector2d_pool.allocate();
 		Vector2d normal = vector2d_pool.allocate();
@@ -233,32 +230,45 @@ public final class SampleGameEngine extends GameEngine{
 
 			if(position.x <= (wall_min.x + radius)){
 				Vector2d linear_velocity = cp.getLinearVelocity();
+				rv.negate(linear_velocity);
 				normal.negate(Vector2d.E1);
-				double d = radius - Math.abs(position.x - wall_min.x);
-				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
-				linear_velocity.madd(impulse, cp.getInvMass());
+				if(normal.inner(rv) < 0.0){
+					double d = radius - Math.abs(position.x - wall_min.x);
+					Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
+					linear_velocity.madd(impulse, cp.getInvMass());
+				}
 			}else if(position.x >= (wall_max.x - radius)){
 				Vector2d linear_velocity = cp.getLinearVelocity();
+				rv.negate(linear_velocity);
 				normal.set(Vector2d.E1);
-				double d = radius - Math.abs(position.x - wall_max.x);
-				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
-				linear_velocity.madd(impulse, cp.getInvMass());
+				if(normal.inner(rv) < 0.0){
+					double d = radius - Math.abs(position.x - wall_max.x);
+					Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
+					linear_velocity.madd(impulse, cp.getInvMass());
+				}
 			}
 			if(position.y <= (wall_min.y + radius)){
 				Vector2d linear_velocity = cp.getLinearVelocity();
+				rv.negate(linear_velocity);
 				normal.negate(Vector2d.E2);
-				double d = radius - Math.abs(position.y - wall_min.y);
-				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
-				linear_velocity.madd(impulse, cp.getInvMass());
+				if(normal.inner(rv) < 0.0){
+					double d = radius - Math.abs(position.y - wall_min.y);
+					Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
+					linear_velocity.madd(impulse, cp.getInvMass());
+				}
 			}else if(position.y >= (wall_max.y - radius)){
 				Vector2d linear_velocity = cp.getLinearVelocity();
+				rv.negate(linear_velocity);
 				normal.set(Vector2d.E2);
-				double d = radius - Math.abs(position.y - wall_max.y);
-				Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
-				linear_velocity.madd(impulse, cp.getInvMass());
+				if(normal.inner(rv) < 0.0){
+					double d = radius - Math.abs(position.y - wall_max.y);
+					Physics.calcImpulse(impulse, normal, e, cp.getMass(), mass, linear_velocity, Vector2d.ZERO, cd, d);
+					linear_velocity.madd(impulse, cp.getInvMass());
+				}
 			}
 		}
 
+		vector2d_pool.release(rv);
 		vector2d_pool.release(impulse);
 		vector2d_pool.release(normal);
 
