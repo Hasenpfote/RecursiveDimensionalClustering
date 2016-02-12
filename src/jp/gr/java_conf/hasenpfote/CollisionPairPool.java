@@ -1,3 +1,5 @@
+package jp.gr.java_conf.hasenpfote;
+
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
 
 /**

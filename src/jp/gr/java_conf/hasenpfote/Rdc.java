@@ -1,7 +1,10 @@
+package jp.gr.java_conf.hasenpfote;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
 import jp.gr.java_conf.hasenpfote.math.Vector2d;
 

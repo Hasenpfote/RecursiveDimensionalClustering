@@ -1,14 +1,9 @@
+package jp.gr.java_conf.hasenpfote;
 
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
 import jp.gr.java_conf.hasenpfote.math.Vector2d;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *

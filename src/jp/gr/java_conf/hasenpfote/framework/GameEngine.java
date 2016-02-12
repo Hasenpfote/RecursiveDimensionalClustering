@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 
 /**
@@ -11,6 +12,9 @@ import java.util.concurrent.TimeUnit;
  * @author Hasenpfote
  */
 public abstract class GameEngine implements Runnable{
+
+	// for log
+	protected final Logger logger;
 
 	/** 1秒[ns] */
 	private static final long ONE_SECOND = (long)1E9;
@@ -38,6 +42,7 @@ public abstract class GameEngine implements Runnable{
 		this.buffer = buffer;
 		active = true;
 		thread = new Thread(this);
+		logger = Logger.getLogger(this.getClass().getName());
 	}
 
 	protected final double getFps(){ return fps; }
@@ -50,6 +55,7 @@ public abstract class GameEngine implements Runnable{
 	public final boolean boot(){
 		if((thread == null) || (thread.isAlive()))
 			return false;
+		logger.info("boot.");
 		thread.start();
 		return true;
 	}
@@ -60,6 +66,7 @@ public abstract class GameEngine implements Runnable{
 	public final void shutdown(){
 		if((thread == null) || (!thread.isAlive()))
 			return;
+		logger.info("shutdown.");
 		active = false;
 		thread.interrupt();
 		try{
@@ -182,7 +189,7 @@ public abstract class GameEngine implements Runnable{
 			cleanup();
 		}
 		*/
-		System.out.println("bye.");
+		logger.info("bye.");
 	}
 
 	/**

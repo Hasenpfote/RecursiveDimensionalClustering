@@ -1,3 +1,5 @@
+package jp.gr.java_conf.hasenpfote;
+
 /**
  * Created by Hasenpfote on 2016/01/31.
  */

@@ -1,3 +1,5 @@
+package jp.gr.java_conf.hasenpfote;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
@@ -75,6 +77,7 @@ public final class SampleGameEngine extends GameEngine{
 
 	@Override
 	protected void initialize(){
+		logger.info("initialize start.");
 		GameSystem.getInstance().setScreenSize(screen_width, screen_height);
 		//GameSystem.getInstance().setPixelsPerUnit((int)PIXELS_PER_METER);
 		GameSystem.getInstance().updateMarix();
@@ -108,6 +111,7 @@ public final class SampleGameEngine extends GameEngine{
 
 			objects.add(cp);
 		}
+		logger.info("initialize end.");
 	}
 
 	@Override
@@ -301,7 +305,7 @@ public final class SampleGameEngine extends GameEngine{
 		Vector2d linear_acceleration = vector2d_pool.allocate();
 		Vector2d impulse = vector2d_pool.allocate();
 
-		for(CircularPlate cp : objects){
+		for(jp.gr.java_conf.hasenpfote.CircularPlate cp : objects){
 			//cp.updatePhysicsComponent(dt);
 			double inv_mass = cp.getInvMass();
 			// acceleration

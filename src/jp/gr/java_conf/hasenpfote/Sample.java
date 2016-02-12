@@ -1,20 +1,41 @@
+package jp.gr.java_conf.hasenpfote;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.*;
 import java.util.EnumSet;
+import java.util.logging.LogManager;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 
 public class Sample{
+
+	private static final String ROOT_DIR = System.getProperty("user.dir");
+	private static final String LOGGING_PROPERTIES = "logging.properties";
+
 	private static final int SCREEN_WIDTH = 1280;
 	private static final int SCREEN_HEIGHT = 960;
 	private static final int NUM_BUFFERS = 2;
 	private SampleGameEngine ge = null;
 
 	public Sample(){
+		// for log
+		String filePath = ROOT_DIR + File.separator + LOGGING_PROPERTIES;
+		try{
+			InputStream inStream = new FileInputStream(filePath);
+			LogManager.getLogManager().readConfiguration(inStream);
+		}
+		catch(FileNotFoundException e){
+			e.printStackTrace();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		//
 		JFrame frame = new JFrame("Recursive Dimensional Clustering");
 		frame.setLayout(null);
 		frame.setResizable(false);
@@ -24,7 +45,6 @@ public class Sample{
 		frame.addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowClosing(WindowEvent e){
-				System.out.println("window closing.");
 				if(ge != null){
 					ge.shutdown();
 				}

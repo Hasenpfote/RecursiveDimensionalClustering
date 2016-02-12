@@ -6,6 +6,8 @@
 package jp.gr.java_conf.hasenpfote.framework;
 
 import java.awt.geom.AffineTransform;
+import java.io.*;
+import java.util.logging.LogManager;
 
 /**
  *
@@ -30,7 +32,6 @@ public class GameSystem{
 	private double aspect;
 
 	private final AffineTransform wtos = new AffineTransform();
-
 
 	public void setScreenSize(int width, int height){
 		screen_width = width;
