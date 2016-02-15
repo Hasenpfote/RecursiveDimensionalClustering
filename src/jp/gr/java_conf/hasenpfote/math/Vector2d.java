@@ -221,4 +221,40 @@ public final class Vector2d{
 	public double angle(Vector2d v){
 		return Math.acos(inner(v));
 	}
+
+	/**
+	 * 線形補間
+	 * @param v1
+	 * @param v2
+	 * @param t		[0,1]
+	 */
+	public void lerp(Vector2d v1, Vector2d v2, double t){
+		x = v1.x + (v2.x - v1.x) * t;
+		y = v1.y + (v2.y - v1.y) * t;
+	}
+
+	/**
+	 * 球面線形補間
+	 * @param v1	||v1|| = 1
+	 * @param v2	||v2|| = 1
+	 * @param t		[0,1]
+	 */
+	public void slerp(Vector2d v1, Vector2d v2, double t){
+		final double theta = v1.angle(v2);
+		if(theta > 0.0){
+			final double fx = Math.sin(theta * (1.0 - t));
+			final double fy = Math.sin(theta * t);
+			final double cosec = 1.0 / Math.sin(theta);
+			x = (fx * v1.x + fy * v2.x) * cosec;
+			y = (fx * v1.y + fy * v2.y) * cosec;
+		}
+		else{
+			set(v1);
+		}
+	}
+
+	@Override
+	public String toString(){
+		return "Vector2d{" + "x=" + x + ", y=" + y + '}';
+	}
 }
