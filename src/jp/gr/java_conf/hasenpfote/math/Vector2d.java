@@ -46,8 +46,7 @@ public final class Vector2d{
 	 * @param v
 	 */
 	public void add(Vector2d v){
-		x += v.x;
-		y += v.y;
+		add(this, v);
 	}
 
 	/**
@@ -75,8 +74,7 @@ public final class Vector2d{
 	 * @param v
 	 */
 	public void sub(Vector2d v){
-		x -= v.x;
-		y -= v.y;
+		sub(this, v);
 	}
 
 	/**
@@ -104,8 +102,7 @@ public final class Vector2d{
 	 * @param s
 	 */
 	public void mul(double s){
-		x *= s;
-		y *= s;
+		mul(this, s);
 	}
 
 	/**
@@ -123,7 +120,7 @@ public final class Vector2d{
 	 * @param s
 	 */
 	public void div(double s){
-		mul(1.0 / s);
+		div(this, s);
 	}
 
 	/**
@@ -132,7 +129,8 @@ public final class Vector2d{
 	 * @param s
 	 */
 	public void div(Vector2d v, double s){
-		mul(v, s);
+		assert(Math.abs(s) > 0.0): "division by zero";
+		mul(v, 1.0 / s);
 	}
 
 	/**
@@ -164,9 +162,7 @@ public final class Vector2d{
 	 * 正規化
 	 */
 	public void normalize(){
-		double sl = length_squared();
-		assert(Math.abs(sl) > 0.0): "division by zero";
-		mul(1.0 / Math.sqrt(sl));
+		normalize(this);
 	}
 
 	/**
@@ -174,16 +170,16 @@ public final class Vector2d{
 	 * @param v
 	 */
 	public void normalize(Vector2d v){
-		set(v);
-		normalize();
+		final double l = v.length();
+		assert(l > 0.0): "division by zero";
+		mul(v, 1.0 / l);
 	}
 
 	/**
 	 * 方向を反転
 	 */
 	public void negate(){
-		x = -x;
-		y = -y;
+		negate(this);
 	}
 
 	/**
@@ -223,7 +219,7 @@ public final class Vector2d{
 	}
 
 	/**
-	 * 線形補間
+	 * v1 と v2 を線形補間し代入
 	 * @param v1
 	 * @param v2
 	 * @param t		[0,1]
@@ -234,9 +230,9 @@ public final class Vector2d{
 	}
 
 	/**
-	 * 球面線形補間
-	 * @param v1	||v1|| = 1
-	 * @param v2	||v2|| = 1
+	 * v1 と v2 を球面線形補間し代入
+	 * @param v1	‖v1‖ = 1
+	 * @param v2	‖v2‖ = 1
 	 * @param t		[0,1]
 	 */
 	public void slerp(Vector2d v1, Vector2d v2, double t){
