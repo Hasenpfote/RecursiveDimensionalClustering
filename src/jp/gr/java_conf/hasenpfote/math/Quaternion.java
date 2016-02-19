@@ -267,25 +267,41 @@ public class Quaternion{
 
 	/**
 	 * q1 と q2 を球面線形補間し代入
-	 * @param q1	‖q1‖=1
-	 * @param q2	‖q2‖=1
-	 * @param t		[0,1]
+	 * @param q1		‖q1‖=1
+	 * @param q2		‖q2‖=1
+	 * @param t			[0,1]
+	 * @param allowFlip
+	 *			true:  360度周期で補間を行う(最大回転変化量は 180度)
+	 *			false: 720度周期で補間を行う(最大回転変化量は 360度)
+	 * allowFlip を true とするとことで最小弧の補間を行い、不要なスピンを低減することができる
 	 */
-	public void slerp(Quaternion q1, Quaternion q2, double t){
-		final double c = q1.inner(q2);
-		if(c < 1.0){
-			final double theta = Math.acos(c);
-			final double fx = Math.sin(theta * (1.0 - t));
-			final double fy = Math.sin(theta * t);
-			final double cosec = 1.0 / Math.sin(theta);
-			w = (fx * q1.w + fy * q2.w) * cosec;
-			x = (fx * q1.x + fy * q2.x) * cosec;
-			y = (fx * q1.y + fy * q2.y) * cosec;
-			z = (fx * q1.z + fy * q2.z) * cosec;
+	public void slerp(Quaternion q1, Quaternion q2, double t, boolean allowFlip){
+		boolean flipped = false;		// q1 または q2 の反転を表す
+		double cos_t = q1.inner(q2);
+		if(allowFlip && (cos_t < 0.0)){	// 最小弧で補間を行う
+			flipped = true;
+			cos_t = -cos_t;
+		}
+
+		double fx, fy;
+		if(DoubleComparer.almostEquals(Math.abs(cos_t), 1.0, 1)){
+			// |cosθ| ≈ 1 → sinθ ≈ 0 の時は線形補間に帰着
+			fx = 1.0 - t;
+			fy = t;
 		}
 		else{
-			set(q1);
+			final double theta = Math.acos(cos_t);
+			final double cosec = 1.0 / Math.sin(theta);
+			fx = Math.sin(theta * (1.0 - t)) * cosec;
+			fy = Math.sin(theta * t) * cosec;
 		}
+		if(flipped){
+			fy = -fy;
+		}
+		w = fx * q1.w + fy * q2.w;
+		x = fx * q1.x + fy * q2.x;
+		y = fx * q1.y + fy * q2.y;
+		z = fx * q1.z + fy * q2.z;
 	}
 
 	/**
