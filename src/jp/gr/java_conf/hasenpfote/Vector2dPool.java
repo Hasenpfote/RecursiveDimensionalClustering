@@ -1,4 +1,4 @@
-package jp.gr.java_conf.hasenpfote.math;
+package jp.gr.java_conf.hasenpfote;
 
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
 import jp.gr.java_conf.hasenpfote.math.Vector2d;

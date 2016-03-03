@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Random;
 
-import jp.gr.java_conf.hasenpfote.math.Vector2dPool;
 import jp.gr.java_conf.hasenpfote.framework.GameEngine;
 import jp.gr.java_conf.hasenpfote.framework.GameSystem;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
@@ -375,7 +374,6 @@ public final class SampleGameEngine extends GameEngine{
 		g2d.drawString("gravity: " + ((gravity_enabled)? "On" : "Off"), 0, metrics.getHeight() + metrics.getAscent());
 		{
 			g2d.setColor(Color.WHITE);
-
 			for(CircularPlate cp : objects){
 				cp.updateRenderComponent(g2d);
 			}
