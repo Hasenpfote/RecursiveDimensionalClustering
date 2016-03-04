@@ -387,17 +387,18 @@ public class Quaternion{
 	 */
 	public void exp_a(Quaternion lnq){
 		assert(DoubleComparer.almostEquals(0.0, lnq.w, 1)): "not a purely imaginary quaternion.";
-		final double norm = lnq.norm();
-		final double theta = 2.0 * norm;
+		final double half_theta = lnq.norm();
+		final double theta = 2.0 * half_theta;
 
-		w = Math.cos(theta * 0.5);
 		if(theta > 0.0){	// TODO: 少し余裕を持たせる
-			final double coef = Math.sin(theta * 0.5) / norm;
-			x = lnq.x * coef;
-			y = lnq.y * coef;
-			z = lnq.z * coef;
+			final double sinc = Math.sin(half_theta) / half_theta;
+			w = Math.cos(half_theta);
+			x = lnq.x * sinc;
+			y = lnq.y * sinc;
+			z = lnq.z * sinc;
 		}
 		else{
+			w = 1.0;
 			x = y = z = 0.0;
 		}
 		/*
@@ -425,9 +426,9 @@ public class Quaternion{
 	 * @param angle	角度(radian)
 	 */
 	public void rotationAxis(Vector3d axis, double angle){
-		final double ht = angle * 0.5;	// half theta
-		final double s = Math.sin(ht);
-		w = Math.cos(ht);
+		final double ha = angle * 0.5;	// half angle
+		final double s = Math.sin(ha);
+		w = Math.cos(ha);
 		x = axis.x * s;
 		y = axis.y * s;
 		z = axis.z * s;
