@@ -15,7 +15,7 @@ import jp.gr.java_conf.hasenpfote.framework.GameSystem;
  */
 public class CircularPlateRenderComponent{
 
-	private static final BasicStroke bs = new BasicStroke(0.05f);
+	private static final BasicStroke bs = new BasicStroke(0.01f);
 
 	public void update(CircularPlate circle, Graphics2D g2d){
 		Stroke olds = g2d.getStroke();

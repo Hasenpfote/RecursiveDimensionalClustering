@@ -145,11 +145,11 @@ public class ComplexNumber{
 	/**
 	 * 累乗.
 	 * @param base
-	 * @param power
+	 * @param exponent
 	 */
-	public void power(ComplexNumber base, double power){
-		final double rho = Math.pow(base.norm(), power);
-		final double arg = base.argument() * power;
+	public void pow(ComplexNumber base, double exponent){
+		final double rho = Math.pow(base.norm(), exponent);
+		final double arg = base.argument() * exponent;
 		polar(rho, arg);
 	}
 

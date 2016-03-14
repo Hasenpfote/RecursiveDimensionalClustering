@@ -342,7 +342,7 @@ public class Quaternion{
 	}
 
 	/**
-	 * lnq の指数部を計算.
+	 * 自然対数の底 e の累乗.
 	 * @param lnq
 	 */
 	public void exp(Quaternion lnq){
@@ -362,7 +362,7 @@ public class Quaternion{
 	}
 
 	/**
-	 * lnq の指数部を計算.
+	 * 自然対数の底 e の累乗.
 	 * @param lnq 	a purely imaginary quaternion.
 	 */
 	public void exp_p(Quaternion lnq){
@@ -381,8 +381,9 @@ public class Quaternion{
 		z = lnq.z * sinc;
 	}
 
+	@Deprecated
 	/**
-	 * lnq の指数部を計算(for axis angle).
+	 * 自然対数の底 e の累乗(for axis angle).
 	 * @param lnq	a purely imaginary quaternion.
 	 */
 	public void exp_a(Quaternion lnq){
@@ -391,7 +392,7 @@ public class Quaternion{
 		final double theta = 2.0 * half_theta;
 
 		if(theta > 0.0){	// TODO: 少し余裕を持たせる
-			final double sinc = Math.sin(half_theta) / half_theta;
+			final double sinc = Math.sin(half_theta) / half_theta; // TODO: 1 / half_theta でよい
 			w = Math.cos(half_theta);
 			x = lnq.x * sinc;
 			y = lnq.y * sinc;
@@ -421,14 +422,37 @@ public class Quaternion{
 	}
 
 	/**
+	 * q の累乗.
+	 * @param base
+	 * @param exponent
+	 */
+	public void pow(Quaternion base, double exponent){
+		ln(base);
+		multiply(exponent);
+		exp(this);
+	}
+
+	/**
+	 * q の累乗.
+	 * @param base		a unit quaternion.
+	 * @param exponent
+	 */
+	public void pow_u(Quaternion base, double exponent){
+		ln_u(base);
+		multiply(exponent);
+		exp_p(this);
+	}
+
+	/**
 	 * 任意軸周りの回転を表すクォータニオンを生成.
 	 * @param axis	任意軸(‖v‖ = 1)
 	 * @param angle	角度(radian)
 	 */
 	public void rotationAxis(Vector3d axis, double angle){
-		final double ha = angle * 0.5;	// half angle
-		final double s = Math.sin(ha);
-		w = Math.cos(ha);
+		assert(DoubleComparer.almostEquals(1.0, axis.length(), 1)): "axis is not a unit quaternion.";
+		final double half_angle = angle * 0.5;
+		final double s = Math.sin(half_angle);
+		w = Math.cos(half_angle);
 		x = axis.x * s;
 		y = axis.y * s;
 		z = axis.z * s;
@@ -446,6 +470,21 @@ public class Quaternion{
 		x = (v1.y * v2.z - v1.z * v2.y) / s;
 		y = (v1.z * v2.x - v1.x * v2.z) / s;
 		z = (v1.x * v2.y - v1.y * v2.x) / s;
+	}
+
+	/**
+	 * q1 と q2 の間の差分.
+	 * <p>
+	 * q1 ⊗ diff = q2
+	 * </p>
+	 * @param q1	a unit quaternion.
+	 * @param q2	a unit quaternion.
+	 */
+	public void rotationalDifference(Quaternion q1, Quaternion q2){
+		assert(DoubleComparer.almostEquals(1.0, q1.norm(), 1)): "q1 is not a unit quaternion.";
+		assert(DoubleComparer.almostEquals(1.0, q2.norm(), 1)): "q2 is not a unit quaternion.";
+		this.conjugate(q1);
+		this.multiply(q2);
 	}
 
 	/**
