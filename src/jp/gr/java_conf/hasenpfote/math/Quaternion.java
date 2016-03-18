@@ -180,9 +180,7 @@ public class Quaternion{
 
 	/**
 	 * 積の逆元.
-	 * <p>
-	 * q^-1 = q* / ‖q‖^2
-	 * </p>
+	 * <p>\f$  q^{-1} = \frac{q^{*}}{\|q\|^{2}}\f$</p>
 	 */
 	public void inverse(){
 		inverse(this);
@@ -190,6 +188,7 @@ public class Quaternion{
 
 	/**
 	 * q の積の逆元.
+	 * <p>\f$  q^{-1} = \frac{q^{*}}{\|q\|^{2}}\f$</p>
 	 * @param q
 	 */
 	public void inverse(Quaternion q){
@@ -204,7 +203,7 @@ public class Quaternion{
 
 	/**
 	 * ノルムの二乗.
-	 * @return	‖q‖^2 = q* ⊗ q
+	 * @return	\f$\|q\|^{2} = q^{*}\otimes q\f$
 	 */
 	public double normSquared(){
 		return w * w + x * x + y * y + z * z;
@@ -212,7 +211,7 @@ public class Quaternion{
 
 	/**
 	 * ノルム.
-	 * @return ‖q‖
+	 * @return \f$\|q\|\f$
 	 */
 	public double norm(){
 		return Math.sqrt(normSquared());
@@ -220,14 +219,15 @@ public class Quaternion{
 
 	/**
 	 * ベクトル部のノルム.
-	 * @return ‖qv‖
+	 * @return	\f$\|q_{v}\|\f$
 	 */
 	public double normV(){
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
 	/**
-	 * 共役(q*).
+	 * 共役.
+	 * <p>\f$q^{*} = [s,-v]\f$</p>
 	 */
 	public void conjugate(){
 		conjugate(this);
@@ -235,6 +235,7 @@ public class Quaternion{
 
 	/**
 	 * q の共役.
+	 * <p>\f$q^{*} = [s,-v]\f$</p>
 	 * @param q
 	 */
 	public void conjugate(Quaternion q){
@@ -271,7 +272,8 @@ public class Quaternion{
 	/**
 	 * sinc 関数のテイラー級数による近似.
 	 * <p>
-	 * sinc(x) = sin(x)/x = 1 - x^2 / 6 + x^4 / 120 - x^6 / 5040 + ...
+	 * sinc(x)<br>
+	 * \f$\frac{\sin{x}}{x} = 1 - \frac{1}{6}x^{2} + \frac{1}{120}x^{4} - \frac{1}{5040}x^{6}\f$
 	 * </p>
 	 * @param x
 	 * @return
@@ -285,7 +287,8 @@ public class Quaternion{
 	/**
 	 * sinc 関数の逆数のテイラー級数による近似.
 	 * <p>
-	 * reciprocal of sinc(x) = x/sin(x) = 1 + x^2 / 6 + 7x^4 / 360 + 31x^6 / 15120 + ...
+	 * reciprocal of sinc(x)<br>
+	 * \f$\frac{x}{\sin{x}} = 1 + \frac{1}{6}x^{2} + \frac{7}{360}x^{4} + \frac{31}{15120}x^{6} + ･･･ \f$
 	 * </p>
 	 * @param x
 	 * @return
@@ -298,6 +301,7 @@ public class Quaternion{
 
 	/**
 	 * q の自然対数.
+	 * <p>\f$\ln{q}\f$</p>
 	 * @param q
 	 */
 	public void ln(Quaternion q){
@@ -320,13 +324,14 @@ public class Quaternion{
 
 	/**
 	 * q の自然対数.
-	 * @param q	a unit quaternion.
+	 * <p>\f$\ln{q}\f$</p>
+	 * @param q		an unit quaternion.
 	 */
 	public void ln_u(Quaternion q){
 		final double i = q.normV();
 		final double phi = Math.atan2(i, q.w);
 		final double norm = q.norm();
-		assert(DoubleComparer.almostEquals(1.0, norm, 1)): "not a unit quaternion.";
+		assert(DoubleComparer.almostEquals(1.0, norm, 1)): "not an unit quaternion.";
 
 		double r_sinc;
 		if(i > 0.0){	// TODO: 少し余裕を持たせる
@@ -343,6 +348,7 @@ public class Quaternion{
 
 	/**
 	 * 自然対数の底 e の累乗.
+	 * <p>\f$e^{q}\f$</p>
 	 * @param lnq
 	 */
 	public void exp(Quaternion lnq){
@@ -363,6 +369,7 @@ public class Quaternion{
 
 	/**
 	 * 自然対数の底 e の累乗.
+	 * <p>\f$e^{q}\f$</p>
 	 * @param lnq 	a purely imaginary quaternion.
 	 */
 	public void exp_p(Quaternion lnq){
@@ -423,6 +430,7 @@ public class Quaternion{
 
 	/**
 	 * q の累乗.
+	 * <p>\f$base^{exponent}\f$</p>
 	 * @param base
 	 * @param exponent
 	 */
@@ -434,7 +442,8 @@ public class Quaternion{
 
 	/**
 	 * q の累乗.
-	 * @param base		a unit quaternion.
+	 * <p>\f$base^{exponent}\f$</p>
+	 * @param base		an unit quaternion.
 	 * @param exponent
 	 */
 	public void pow_u(Quaternion base, double exponent){
@@ -445,11 +454,11 @@ public class Quaternion{
 
 	/**
 	 * 任意軸周りの回転を表すクォータニオンを生成.
-	 * @param axis	任意軸(‖v‖ = 1)
-	 * @param angle	角度(radian)
+	 * @param axis		an unit vector.
+	 * @param angle		an angle in radians.
 	 */
 	public void rotationAxis(Vector3d axis, double angle){
-		assert(DoubleComparer.almostEquals(1.0, axis.length(), 1)): "axis is not a unit quaternion.";
+		assert(DoubleComparer.almostEquals(1.0, axis.length(), 1)): "axis is not an unit quaternion.";
 		final double half_angle = angle * 0.5;
 		final double s = Math.sin(half_angle);
 		w = Math.cos(half_angle);
@@ -460,8 +469,8 @@ public class Quaternion{
 
 	/**
 	 * v1 と v2 間の最小弧回転を表すクォータニオンを生成.
-	 * @param v1 ‖v1‖=1
-	 * @param v2 ‖v2‖=1
+	 * @param v1	an unit vector.
+	 * @param v2	an unit vector.
 	 */
 	public void rotationShortestArc(Vector3d v1, Vector3d v2){
 		final double d = v1.inner(v2);
@@ -474,15 +483,13 @@ public class Quaternion{
 
 	/**
 	 * q1 と q2 の間の差分.
-	 * <p>
-	 * q1 ⊗ diff = q2
-	 * </p>
-	 * @param q1	a unit quaternion.
-	 * @param q2	a unit quaternion.
+	 * <p>\f$q_{1}\otimes diff = q_{2}\f$</p>
+	 * @param q1	an unit quaternion.
+	 * @param q2	an unit quaternion.
 	 */
 	public void rotationalDifference(Quaternion q1, Quaternion q2){
-		assert(DoubleComparer.almostEquals(1.0, q1.norm(), 1)): "q1 is not a unit quaternion.";
-		assert(DoubleComparer.almostEquals(1.0, q2.norm(), 1)): "q2 is not a unit quaternion.";
+		assert(DoubleComparer.almostEquals(1.0, q1.norm(), 1)): "q1 is not an unit quaternion.";
+		assert(DoubleComparer.almostEquals(1.0, q2.norm(), 1)): "q2 is not an unit quaternion.";
 		this.conjugate(q1);
 		this.multiply(q2);
 	}
@@ -491,9 +498,10 @@ public class Quaternion{
 	 * 線形補間で q1 と q2 間を補間.
 	 * @param q1
 	 * @param q2
-	 * @param t		[0,1]
+	 * @param t		\f$[0,1]\f$
 	 */
 	public void lerp(Quaternion q1, Quaternion q2, double t){
+		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
 		w = q1.w + t * (q2.w - q1.w);
 		x = q1.x + t * (q2.x - q1.x);
 		y = q1.y + t * (q2.y - q1.y);
@@ -502,15 +510,16 @@ public class Quaternion{
 
 	/**
 	 * 球面線形補間で q1 と q2 間を補間.
-	 * @param q1		‖q1‖=1
-	 * @param q2		‖q2‖=1
-	 * @param t			[0,1]
+	 * @param q1	an unit quaternion.
+	 * @param q2	an unit quaternion.
+	 * @param t		\f$[0,1]\f$
 	 * @param allowFlip
 	 *			true:  360度周期で補間を行う(最大回転変化量は 180度)
 	 *			false: 720度周期で補間を行う(最大回転変化量は 360度)
 	 * allowFlip を true とするとことで最小弧の補間を行い、不要なスピンを低減することができる
 	 */
 	public void slerp(Quaternion q1, Quaternion q2, double t, boolean allowFlip){
+		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
 		boolean flipped = false;		// q1 または q2 の反転を表す
 		double cos_t = q1.inner(q2);
 		if(allowFlip && (cos_t < 0.0)){	// 最小弧で補間を行う
@@ -537,6 +546,48 @@ public class Quaternion{
 		x = fx * q1.x + fy * q2.x;
 		y = fx * q1.y + fy * q2.y;
 		z = fx * q1.z + fy * q2.z;
+	}
+
+	/**
+	 * 球面三次補間で p と q 間を補間.
+	 * <p>\f$S_{n}(t) = squad(t; q_{n}, q_{n+1}, a_{n}, b_{n+1})\f$</p>
+	 * @param p		\f$q_{n}\f$
+	 * @param q		\f$q_{n+1}\f$
+	 * @param a     \f$a_{n}\f$
+	 * @param b     \f$b_{n+1}\f$
+	 * @param t     \f$[0,1]\f$
+	 * @param temps 作業領域(サイズ 2 を必要とする)
+	 */
+	public void squad(Quaternion p, Quaternion q, Quaternion a, Quaternion b, double t, Quaternion[] temps){
+		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
+		temps[0].slerp(p, q, t, false);
+		temps[1].slerp(a, b, t, false);
+		slerp(temps[0], temps[1], 2*t*(1-t), false);
+	}
+
+	/**
+	 * スプライン補間で利用する制御点を計算.
+	 * <p>\f$a_{n} = b_{n} = q_{n}\otimes e^{-\frac{ln{(q_{n}^{-1}\otimes q_{n-1})} + ln{(q_{n}^{-1}\otimes q_{n+1})}}{4}}\f$</p>
+	 * <pre>{@code
+	 *      a = spline(q0, q1, q2);
+	 *      b = spline(q1, q2, q3);
+	 *      q = squad(q1, q2, a, b, t);
+	 * }</pre>
+	 * @param prev      \f$q_{n-1}\f$
+	 * @param current   \f$q_{n}\f$
+	 * @param next      \f$q_{n+1}\f$
+	 * @param temps     作業領域(サイズ 2 を必要とする)
+	 */
+	public void spline(Quaternion prev, Quaternion current, Quaternion next, Quaternion[] temps){
+		conjugate(current);
+		temps[0].multiply(this, prev);
+		temps[0].ln_u(temps[0]);
+		temps[1].multiply(this, next);
+		temps[1].ln_u(temps[1]);
+		add(temps[0], temps[1]);
+		multiply(-0.25);
+		exp_p(this);
+		multiply(current, this);
 	}
 
 	@Override
