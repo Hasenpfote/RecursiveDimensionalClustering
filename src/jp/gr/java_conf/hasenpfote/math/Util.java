@@ -6,6 +6,21 @@ package jp.gr.java_conf.hasenpfote.math;
 public final class Util{
 
 	/**
+	 * clamp
+	 * @param value
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public static double clamp(double value, double min, double max){
+		if(value < min)
+			return min;
+		if(value > max)
+			return max;
+		return value;
+	}
+
+	/**
 	 * 順列
 	 * @param n
 	 * @param r
