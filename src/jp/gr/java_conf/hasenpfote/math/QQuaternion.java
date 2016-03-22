@@ -36,9 +36,9 @@ public final class QQuaternion{
 	 * 量子化.
 	 * <pre>
 	 * [62 - 63]bits: unuse<br>
-	 * [60 - 61]bits: specifying the max component among X, Y, Z, W.
-	 * [40 - 59]bits: component1
-	 * [20 - 39]bits: component2
+	 * [60 - 61]bits: specifying the max component among X, Y, Z, W.<br>
+	 * [40 - 59]bits: component1<br>
+	 * [20 - 39]bits: component2<br>
 	 * [ 0 - 19]bits: component3
 	 * </pre>
 	 * @param index	specifying the max component among X, Y, Z, W.

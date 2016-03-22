@@ -495,6 +495,29 @@ public class Quaternion{
 	}
 
 	/**
+	 * 回転軸と角度を計算.
+	 * @param axis
+	 * @return	an angle in radians.
+	 */
+	public double ToAxisAngle(Vector3d axis){
+		assert(DoubleComparer.almostEquals(1.0, norm(), 1)): "quaternion is not an unit quaternion.";
+		double i = normV();
+		if(i > 0.0){	// TODO: 少し余裕を持たせる
+			double r_i = 1.0 / i;
+			axis.x = x * r_i;
+			axis.y = y * r_i;
+			axis.z = z * r_i;
+			return 2.0 * Math.atan2(i, w);
+		}
+		else{
+			axis.x = 0.0;
+			axis.y = 0.0;
+			axis.z = 0.0;
+			return 0.0;
+		}
+	}
+
+	/**
 	 * 線形補間で q1 と q2 間を補間.
 	 * @param q1
 	 * @param q2
