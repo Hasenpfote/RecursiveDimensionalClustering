@@ -2,7 +2,7 @@ package jp.gr.java_conf.hasenpfote;
 
 import java.awt.Graphics2D;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
-import jp.gr.java_conf.hasenpfote.math.Vector2d;
+import jp.gr.java_conf.hasenpfote.math.Vector2f;
 
 /**
  *
@@ -14,11 +14,11 @@ public class CircularPlate{
 	private CircularPlatePhysicsComponent pc = null;
 	private CircularPlateRenderComponent rc = null;
 
-	private final Vector2d position = new Vector2d();
-	private final Vector2d linear_velocity = new Vector2d();
-	private final Vector2d force = new Vector2d();
-	private double mass, inv_mass;
-	private double radius;
+	private final Vector2f position = new Vector2f();
+	private final Vector2f linear_velocity = new Vector2f();
+	private final Vector2f force = new Vector2f();
+	private float mass, inv_mass;
+	private float radius;
 
 	public CircularPlate(CircularPlateInputComponent ic,
 						 CircularPlatePhysicsComponent pc,
@@ -43,36 +43,36 @@ public class CircularPlate{
 			rc.update(this, g2d);
 	}
 
-	public Vector2d getPosition(){
+	public Vector2f getPosition(){
 		return position;
 	}
 
-	public Vector2d getLinearVelocity(){
+	public Vector2f getLinearVelocity(){
 		return linear_velocity;
 	}
 
-	public Vector2d getForce(){
+	public Vector2f getForce(){
 		return force;
 	}
 
-	public double getMass(){
+	public float getMass(){
 		return mass;
 	}
 
-	public void setMass(double mass){
+	public void setMass(float mass){
 		this.mass = mass;
-		inv_mass = 1.0 / mass;
+		inv_mass = 1.0f / mass;
 	}
 
-	public double getInvMass(){
+	public float getInvMass(){
 		return inv_mass;
 	}
 
-	public double getRadius(){
+	public float getRadius(){
 		return radius;
 	}
 
-	public void setRadius(double radius){
+	public void setRadius(float radius){
 		this.radius = radius;
 	}
 }

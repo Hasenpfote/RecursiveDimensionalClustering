@@ -3,40 +3,41 @@ package jp.gr.java_conf.hasenpfote.math;
 /**
  * Created by Hasenpfote on 2016/01/29.
  */
-public final class Vector2d{
+public final class Vector2f {
 
-	public static final Vector2d ZERO = new Vector2d(0.0, 0.0);
-	public static final Vector2d E1 = new Vector2d(1.0, 0.0);
-	public static final Vector2d E2 = new Vector2d(0.0, 1.0);
+	public static final Vector2f ZERO = new Vector2f(0.0f, 0.0f);
+	public static final Vector2f E1 = new Vector2f(1.0f, 0.0f);
+	public static final Vector2f E2 = new Vector2f(0.0f, 1.0f);
 
-	public double x, y;
+	public float x;
+	public float y;
 
-	public Vector2d(){
+	public Vector2f(){
 	}
 
-	public Vector2d(Vector2d v){
+	public Vector2f(Vector2f v){
 		set(v);
 	}
 
-	public Vector2d(double x, double y){
+	public Vector2f(float x, float y){
 		set(x, y);
 	}
 
-	public Vector2d(double[] v){
+	public Vector2f(float[] v){
 		set(v);
 	}
 
-	public void set(Vector2d v){
+	public void set(Vector2f v){
 		x = v.x;
 		y = v.y;
 	}
 
-	public void set(double x, double y){
+	public void set(float x, float y){
 		this.x = x;
 		this.y = y;
 	}
 
-	public void set(double[] v){
+	public void set(float[] v){
 		x = v[0];
 		y = v[1];
 	}
@@ -45,7 +46,7 @@ public final class Vector2d{
 	 * v を加算代入
 	 * @param v
 	 */
-	public void add(Vector2d v){
+	public void add(Vector2f v){
 		add(this, v);
 	}
 
@@ -54,7 +55,7 @@ public final class Vector2d{
 	 * @param v1
 	 * @param v2
 	 */
-	public void add(Vector2d v1, Vector2d v2){
+	public void add(Vector2f v1, Vector2f v2){
 		x = v1.x + v2.x;
 		y = v1.y + v2.y;
 	}
@@ -64,7 +65,7 @@ public final class Vector2d{
 	 * @param v
 	 * @param s
 	 */
-	public void madd(Vector2d v, double s){
+	public void madd(Vector2f v, float s){
 		x += v.x * s;
 		y += v.y * s;
 	}
@@ -73,8 +74,8 @@ public final class Vector2d{
 	 * 減算代入
 	 * @param v
 	 */
-	public void sub(Vector2d v){
-		sub(this, v);
+	public void subtract(Vector2f v){
+		subtract(this, v);
 	}
 
 	/**
@@ -82,7 +83,7 @@ public final class Vector2d{
 	 * @param v1
 	 * @param v2
 	 */
-	public void sub(Vector2d v1, Vector2d v2){
+	public void subtract(Vector2f v1, Vector2f v2){
 		x = v1.x - v2.x;
 		y = v1.y - v2.y;
 	}
@@ -92,7 +93,7 @@ public final class Vector2d{
 	 * @param v
 	 * @param s
 	 */
-	public void msub(Vector2d v, double s){
+	public void msub(Vector2f v, float s){
 		x -= v.x * s;
 		y -= v.y * s;
 	}
@@ -101,8 +102,8 @@ public final class Vector2d{
 	 * 乗算代入
 	 * @param s
 	 */
-	public void mul(double s){
-		mul(this, s);
+	public void multiply(float s){
+		multiply(this, s);
 	}
 
 	/**
@@ -110,7 +111,7 @@ public final class Vector2d{
 	 * @param v
 	 * @param s
 	 */
-	public void mul(Vector2d v, double s){
+	public void multiply(Vector2f v, float s){
 		x = v.x * s;
 		y = v.y * s;
 	}
@@ -119,8 +120,8 @@ public final class Vector2d{
 	 * 除算代入
 	 * @param s
 	 */
-	public void div(double s){
-		div(this, s);
+	public void divide(float s){
+		divide(this, s);
 	}
 
 	/**
@@ -128,9 +129,10 @@ public final class Vector2d{
 	 * @param v
 	 * @param s
 	 */
-	public void div(Vector2d v, double s){
+	public void divide(Vector2f v, float s){
 		assert(Math.abs(s) > 0.0): "division by zero";
-		mul(v, 1.0 / s);
+		x = v.x / s;
+		y = v.y / s;
 	}
 
 	/**
@@ -138,7 +140,7 @@ public final class Vector2d{
 	 * @param v
 	 * @return
 	 */
-	public double inner(Vector2d v){
+	public float inner(Vector2f v){
 		return x * v.x + y * v.y;
 	}
 
@@ -146,7 +148,7 @@ public final class Vector2d{
 	 * 長さの二乗
 	 * @return
 	 */
-	public double length_squared(){
+	public float length_squared(){
 		return x * x + y * y;
 	}
 
@@ -154,8 +156,8 @@ public final class Vector2d{
 	 * 長さ
 	 * @return
 	 */
-	public double length(){
-		return Math.sqrt(length_squared());
+	public float length(){
+		return (float)Math.sqrt(length_squared());
 	}
 
 	/**
@@ -169,10 +171,10 @@ public final class Vector2d{
 	 * v を正規化し代入
 	 * @param v
 	 */
-	public void normalize(Vector2d v){
-		final double l = v.length();
-		assert(l > 0.0): "division by zero";
-		mul(v, 1.0 / l);
+	public void normalize(Vector2f v){
+		final float l = v.length();
+		assert(l > 0.0f): "division by zero";
+		multiply(v, 1.0f / l);
 	}
 
 	/**
@@ -186,7 +188,7 @@ public final class Vector2d{
 	 * v の方向を反転し代入
 	 * @param v
 	 */
-	public void negate(Vector2d v){
+	public void negate(Vector2f v){
 		x = -v.x;
 		y = -v.y;
 	}
@@ -196,8 +198,8 @@ public final class Vector2d{
 	 * @param v
 	 * @return
 	 */
-	public boolean isPerpendicular(Vector2d v){
-		return !(Math.abs(inner(v)) > 0.0);
+	public boolean isPerpendicular(Vector2f v){
+		return !(Math.abs(inner(v)) > 0.0f);
 	}
 
 	/**
@@ -205,8 +207,8 @@ public final class Vector2d{
 	 * @param v
 	 * @return
 	 */
-	public boolean isParallel(Vector2d v){
-		return !(Math.abs(inner(v)) < 1.0);
+	public boolean isParallel(Vector2f v){
+		return !(Math.abs(inner(v)) < 1.0f);
 	}
 
 	/**
@@ -214,8 +216,8 @@ public final class Vector2d{
 	 * @param v
 	 * @return The angle in radians
 	 */
-	public double angle(Vector2d v){
-		return Math.acos(inner(v));
+	public float angle(Vector2f v){
+		return (float)Math.acos(inner(v));
 	}
 
 	/**
@@ -224,7 +226,7 @@ public final class Vector2d{
 	 * @param v2
 	 * @param t		[0,1]
 	 */
-	public void lerp(Vector2d v1, Vector2d v2, double t){
+	public void lerp(Vector2f v1, Vector2f v2, float t){
 		x = v1.x + (v2.x - v1.x) * t;
 		y = v1.y + (v2.y - v1.y) * t;
 	}
@@ -235,12 +237,12 @@ public final class Vector2d{
 	 * @param v2	‖v2‖ = 1
 	 * @param t		[0,1]
 	 */
-	public void slerp(Vector2d v1, Vector2d v2, double t){
-		final double theta = v1.angle(v2);
-		if(theta > 0.0){
-			final double fx = Math.sin(theta * (1.0 - t));
-			final double fy = Math.sin(theta * t);
-			final double cosec = 1.0 / Math.sin(theta);
+	public void slerp(Vector2f v1, Vector2f v2, float t){
+		final float theta = v1.angle(v2);
+		if(theta > 0.0f){
+			final float fx = (float)Math.sin(theta * (1.0f - t));
+			final float fy = (float)Math.sin(theta * t);
+			final float cosec = 1.0f / (float)Math.sin(theta);
 			x = (fx * v1.x + fy * v2.x) * cosec;
 			y = (fx * v1.y + fy * v2.y) * cosec;
 		}
@@ -251,6 +253,6 @@ public final class Vector2d{
 
 	@Override
 	public String toString(){
-		return "Vector2d{" + "x=" + x + ", y=" + y + '}';
+		return "Vector2f{" + "x=" + x + ", y=" + y + '}';
 	}
 }

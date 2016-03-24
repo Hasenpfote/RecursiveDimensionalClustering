@@ -5,10 +5,13 @@ package jp.gr.java_conf.hasenpfote.math;
  */
 public class Quaternion{
 
-	public static final Quaternion ZERO = new Quaternion(0.0, 0.0, 0.0, 0.0);
-	public static final Quaternion IDENTITY  = new Quaternion(1.0, 0.0, 0.0, 0.0);
+	public static final Quaternion ZERO = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+	public static final Quaternion IDENTITY  = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
 
-	public double w, x, y, z;
+	public float w;
+	public float x;
+	public float y;
+	public float z;
 
 	public Quaternion(){
 	}
@@ -17,11 +20,11 @@ public class Quaternion{
 		set(q);
 	}
 
-	public Quaternion(double w, double x, double y, double z){
+	public Quaternion(float w, float x, float y, float z){
 		set(w, x, y, z);
 	}
 
-	public Quaternion(double s, Vector3d v){
+	public Quaternion(float s, Vector3f v){
 		set(s, v);
 	}
 
@@ -32,14 +35,14 @@ public class Quaternion{
 		z = q.z;
 	}
 
-	public void set(double w, double x, double y, double z){
+	public void set(float w, float x, float y, float z){
 		this.w = w;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public void set(double s, Vector3d v){
+	public void set(float s, Vector3f v){
 		w = s;
 		x = v.x;
 		y = v.y;
@@ -50,15 +53,15 @@ public class Quaternion{
 	 * zero quaternion
 	 */
 	public void zero(){
-		w = x = y = z = 0.0;
+		w = x = y = z = 0.0f;
 	}
 
 	/**
 	 * identity quaternion
 	 */
 	public void identity(){
-		w = 1.0;
-		x = y = z = 0.0;
+		w = 1.0f;
+		x = y = z = 0.0f;
 	}
 
 	/**
@@ -133,10 +136,10 @@ public class Quaternion{
 	 * @param q2
 	 */
 	public void multiply(Quaternion q1, Quaternion q2){
-		final double _w = q1.w * q2.w - (q1.x * q2.x + q1.y * q2.y + q1.z * q2.z);
-		final double _x = q1.w * q2.x + q2.w * q1.x + (q1.y * q2.z - q1.z * q2.y);
-		final double _y = q1.w * q2.y + q2.w * q1.y + (q1.z * q2.x - q1.x * q2.z);
-		final double _z = q1.w * q2.z + q2.w * q1.z + (q1.x * q2.y - q1.y * q2.x);
+		final float _w = q1.w * q2.w - (q1.x * q2.x + q1.y * q2.y + q1.z * q2.z);
+		final float _x = q1.w * q2.x + q2.w * q1.x + (q1.y * q2.z - q1.z * q2.y);
+		final float _y = q1.w * q2.y + q2.w * q1.y + (q1.z * q2.x - q1.x * q2.z);
+		final float _z = q1.w * q2.z + q2.w * q1.z + (q1.x * q2.y - q1.y * q2.x);
 		set(_w, _x, _y, _z);
 	}
 
@@ -144,7 +147,7 @@ public class Quaternion{
 	 * s との積.
 	 * @param s
 	 */
-	public void multiply(double s){
+	public void multiply(float s){
 		multiply(this, s);
 	}
 
@@ -153,7 +156,7 @@ public class Quaternion{
 	 * @param q
 	 * @param s
 	 */
-	public void multiply(Quaternion q, double s){
+	public void multiply(Quaternion q, float s){
 		w = q.w * s;
 		x = q.x * s;
 		y = q.y * s;
@@ -164,7 +167,7 @@ public class Quaternion{
 	 * s との商.
 	 * @param s
 	 */
-	public void divide(double s){
+	public void divide(float s){
 		divide(this, s);
 	}
 
@@ -173,9 +176,12 @@ public class Quaternion{
 	 * @param q
 	 * @param s
 	 */
-	public void divide(Quaternion q, double s){
+	public void divide(Quaternion q, float s){
 		assert(Math.abs(s) > 0.0): "division by zero.";
-		multiply(q, 1.0 / s);
+		w = q.w / s;
+		x = q.x / s;
+		y = q.y / s;
+		z = q.z / s;
 	}
 
 	/**
@@ -192,9 +198,9 @@ public class Quaternion{
 	 * @param q
 	 */
 	public void inverse(Quaternion q){
-		double norm_sq = q.normSquared();
-		assert(norm_sq > 0.0): "division by zero.";
-		norm_sq = 1.0 / norm_sq;
+		float norm_sq = q.normSquared();
+		assert(norm_sq > 0.0f): "division by zero.";
+		norm_sq = 1.0f / norm_sq;
 		w =  q.w * norm_sq;
 		x = -q.x * norm_sq;
 		y = -q.y * norm_sq;
@@ -205,7 +211,7 @@ public class Quaternion{
 	 * ノルムの二乗.
 	 * @return	\f$\|q\|^{2} = q^{*}\otimes q\f$
 	 */
-	public double normSquared(){
+	public float normSquared(){
 		return w * w + x * x + y * y + z * z;
 	}
 
@@ -213,16 +219,16 @@ public class Quaternion{
 	 * ノルム.
 	 * @return \f$\|q\|\f$
 	 */
-	public double norm(){
-		return Math.sqrt(normSquared());
+	public float norm(){
+		return (float)Math.sqrt(normSquared());
 	}
 
 	/**
 	 * ベクトル部のノルム.
 	 * @return	\f$\|q_{v}\|\f$
 	 */
-	public double normV(){
-		return Math.sqrt(x * x + y * y + z * z);
+	public float normV(){
+		return (float)Math.sqrt(x * x + y * y + z * z);
 	}
 
 	/**
@@ -265,7 +271,7 @@ public class Quaternion{
 	 * @param q
 	 * @return
 	 */
-	public double inner(Quaternion q){
+	public float inner(Quaternion q){
 		return w * q.w + x * q.x + y * q.y + z * q.z;
 	}
 
@@ -278,10 +284,10 @@ public class Quaternion{
 	 * @param x
 	 * @return
 	 */
-	private static double _sinc(double x){
-		final double x2 = x * x;
-		final double x4 = x2 * x2;
-		return 1.0 - x2 / 6.0 + x4 / 120.0 - (x2 * x4) / 5040.0;
+	private static float _sinc(float x){
+		final float x2 = x * x;
+		final float x4 = x2 * x2;
+		return 1.0f - x2 / 6.0f + x4 / 120.0f - (x2 * x4) / 5040.0f;
 	}
 
 	/**
@@ -293,10 +299,10 @@ public class Quaternion{
 	 * @param x
 	 * @return
 	 */
-	private static double _rsinc(double x){
-		final double x2 = x * x;
-		final double x4 = x2 * x2;
-		return 1.0 + x2 / 6.0 + 7 * x4 / 360.0 + 31.0 * (x2 * x4) / 15120.0;
+	private static float _rsinc(float x){
+		final float x2 = x * x;
+		final float x4 = x2 * x2;
+		return 1.0f + x2 / 6.0f + 7.0f * x4 / 360.0f + 31.0f * (x2 * x4) / 15120.0f;
 	}
 
 	/**
@@ -305,18 +311,18 @@ public class Quaternion{
 	 * @param q
 	 */
 	public void ln(Quaternion q){
-		final double i = q.normV();
-		final double phi = Math.atan2(i, q.w);
-		final double norm = q.norm();
+		final float i = q.normV();
+		final float phi = (float)Math.atan2(i, q.w);
+		final float norm = q.norm();
 
-		double coef;
+		float coef;
 		if(i > 0.0){	// TODO: 少し余裕を持たせる
 			coef = phi / i;
 		}
 		else{
 			coef = _rsinc(phi) / norm;
 		}
-		w = Math.log(norm);
+		w = (float)Math.log(norm);
 		x = coef * q.x;
 		y = coef * q.y;
 		z = coef * q.z;
@@ -328,19 +334,19 @@ public class Quaternion{
 	 * @param q		an unit quaternion.
 	 */
 	public void ln_u(Quaternion q){
-		final double i = q.normV();
-		final double phi = Math.atan2(i, q.w);
-		final double norm = q.norm();
-		assert(DoubleComparer.almostEquals(1.0, norm, 1)): "not an unit quaternion.";
+		final float i = q.normV();
+		final float phi = (float)Math.atan2(i, q.w);
+		final float norm = q.norm();
+		assert(FloatComparer.almostEquals(1.0f, norm, 1)): "not an unit quaternion.";
 
-		double r_sinc;
-		if(i > 0.0){	// TODO: 少し余裕を持たせる
+		float r_sinc;
+		if(i > 0.0f){	// TODO: 少し余裕を持たせる
 			r_sinc = phi / (i / norm);
 		}
 		else{
 			r_sinc = _rsinc(phi);
 		}
-		w = 0.0;
+		w = 0.0f;
 		x = r_sinc * q.x;
 		y = r_sinc * q.y;
 		z = r_sinc * q.z;
@@ -352,16 +358,16 @@ public class Quaternion{
 	 * @param lnq
 	 */
 	public void exp(Quaternion lnq){
-		final double i = lnq.normV();
-		double sinc;
-		if(i > 0.0){	// TODO: 少し余裕を持たせる
-			sinc = Math.sin(i) / i;
+		final float i = lnq.normV();
+		float sinc;
+		if(i > 0.0f){	// TODO: 少し余裕を持たせる
+			sinc = (float)Math.sin(i) / i;
 		}
 		else{
 			sinc = _sinc(i);
 		}
-		final double exp_w = Math.exp(lnq.w);
-		w = exp_w * Math.cos(i);
+		final float exp_w = (float)Math.exp(lnq.w);
+		w = exp_w * (float)Math.cos(i);
 		x = exp_w * lnq.x * sinc;
 		y = exp_w * lnq.y * sinc;
 		z = exp_w * lnq.z * sinc;
@@ -373,16 +379,16 @@ public class Quaternion{
 	 * @param lnq 	a purely imaginary quaternion.
 	 */
 	public void exp_p(Quaternion lnq){
-		assert(DoubleComparer.almostEquals(0.0, lnq.w, 1)): "not a purely imaginary quaternion.";
-		final double i = lnq.normV();
-		double sinc;
-		if(i > 0.0){	// TODO: 少し余裕を持たせる
-			sinc = Math.sin(i) / i;
+		assert(FloatComparer.almostEquals(0.0f, lnq.w, 1)): "not a purely imaginary quaternion.";
+		final float i = lnq.normV();
+		float sinc;
+		if(i > 0.0f){	// TODO: 少し余裕を持たせる
+			sinc = (float)Math.sin(i) / i;
 		}
 		else{
 			sinc = _sinc(i);
 		}
-		w = Math.cos(i);
+		w = (float)Math.cos(i);
 		x = lnq.x * sinc;
 		y = lnq.y * sinc;
 		z = lnq.z * sinc;
@@ -394,20 +400,20 @@ public class Quaternion{
 	 * @param lnq	a purely imaginary quaternion.
 	 */
 	public void exp_a(Quaternion lnq){
-		assert(DoubleComparer.almostEquals(0.0, lnq.w, 1)): "not a purely imaginary quaternion.";
-		final double half_theta = lnq.norm();
-		final double theta = 2.0 * half_theta;
+		assert(FloatComparer.almostEquals(0.0f, lnq.w, 1)): "not a purely imaginary quaternion.";
+		final float half_theta = lnq.norm();
+		final float theta = 2.0f * half_theta;
 
-		if(theta > 0.0){	// TODO: 少し余裕を持たせる
-			final double sinc = Math.sin(half_theta) / half_theta; // TODO: 1 / half_theta でよい
-			w = Math.cos(half_theta);
+		if(theta > 0.0f){	// TODO: 少し余裕を持たせる
+			final float sinc = (float)Math.sin(half_theta) / half_theta; // TODO: 1 / half_theta でよい
+			w = (float)Math.cos(half_theta);
 			x = lnq.x * sinc;
 			y = lnq.y * sinc;
 			z = lnq.z * sinc;
 		}
 		else{
-			w = 1.0;
-			x = y = z = 0.0;
+			w = 1.0f;
+			x = y = z = 0.0f;
 		}
 		/*
         double vx = 2.0 * lnq.x;
@@ -434,7 +440,7 @@ public class Quaternion{
 	 * @param base
 	 * @param exponent
 	 */
-	public void pow(Quaternion base, double exponent){
+	public void pow(Quaternion base, float exponent){
 		ln(base);
 		multiply(exponent);
 		exp(this);
@@ -446,7 +452,7 @@ public class Quaternion{
 	 * @param base		an unit quaternion.
 	 * @param exponent
 	 */
-	public void pow_u(Quaternion base, double exponent){
+	public void pow_u(Quaternion base, float exponent){
 		ln_u(base);
 		multiply(exponent);
 		exp_p(this);
@@ -457,11 +463,11 @@ public class Quaternion{
 	 * @param axis		an unit vector.
 	 * @param angle		an angle in radians.
 	 */
-	public void rotationAxis(Vector3d axis, double angle){
-		assert(DoubleComparer.almostEquals(1.0, axis.length(), 1)): "axis is not an unit quaternion.";
-		final double half_angle = angle * 0.5;
-		final double s = Math.sin(half_angle);
-		w = Math.cos(half_angle);
+	public void rotationAxis(Vector3f axis, float angle){
+		assert(FloatComparer.almostEquals(1.0f, axis.length(), 1)): "axis is not an unit quaternion.";
+		final float half_angle = angle * 0.5f;
+		final float s = (float)Math.sin(half_angle);
+		w = (float)Math.cos(half_angle);
 		x = axis.x * s;
 		y = axis.y * s;
 		z = axis.z * s;
@@ -472,10 +478,10 @@ public class Quaternion{
 	 * @param v1	an unit vector.
 	 * @param v2	an unit vector.
 	 */
-	public void rotationShortestArc(Vector3d v1, Vector3d v2){
-		final double d = v1.inner(v2);
-		final double s = Math.sqrt((1.0 + d) * 2.0);
-		w = s * 0.5;
+	public void rotationShortestArc(Vector3f v1, Vector3f v2){
+		final float d = v1.inner(v2);
+		final float s = (float)Math.sqrt((1.0f + d) * 2.0f);
+		w = s * 0.5f;
 		x = (v1.y * v2.z - v1.z * v2.y) / s;
 		y = (v1.z * v2.x - v1.x * v2.z) / s;
 		z = (v1.x * v2.y - v1.y * v2.x) / s;
@@ -488,8 +494,8 @@ public class Quaternion{
 	 * @param q2	an unit quaternion.
 	 */
 	public void rotationalDifference(Quaternion q1, Quaternion q2){
-		assert(DoubleComparer.almostEquals(1.0, q1.norm(), 1)): "q1 is not an unit quaternion.";
-		assert(DoubleComparer.almostEquals(1.0, q2.norm(), 1)): "q2 is not an unit quaternion.";
+		assert(FloatComparer.almostEquals(1.0f, q1.norm(), 1)): "q1 is not an unit quaternion.";
+		assert(FloatComparer.almostEquals(1.0f, q2.norm(), 1)): "q2 is not an unit quaternion.";
 		this.conjugate(q1);
 		this.multiply(q2);
 	}
@@ -499,21 +505,21 @@ public class Quaternion{
 	 * @param axis
 	 * @return	an angle in radians.
 	 */
-	public double ToAxisAngle(Vector3d axis){
-		assert(DoubleComparer.almostEquals(1.0, norm(), 1)): "quaternion is not an unit quaternion.";
-		double i = normV();
-		if(i > 0.0){	// TODO: 少し余裕を持たせる
-			double r_i = 1.0 / i;
+	public float ToAxisAngle(Vector3f axis){
+		assert(FloatComparer.almostEquals(1.0f, norm(), 1)): "quaternion is not an unit quaternion.";
+		float i = normV();
+		if(i > 0.0f){	// TODO: 少し余裕を持たせる
+			float r_i = 1.0f / i;
 			axis.x = x * r_i;
 			axis.y = y * r_i;
 			axis.z = z * r_i;
-			return 2.0 * Math.atan2(i, w);
+			return 2.0f * (float)Math.atan2(i, w);
 		}
 		else{
-			axis.x = 0.0;
-			axis.y = 0.0;
-			axis.z = 0.0;
-			return 0.0;
+			axis.x = 0.0f;
+			axis.y = 0.0f;
+			axis.z = 0.0f;
+			return 0.0f;
 		}
 	}
 
@@ -523,8 +529,8 @@ public class Quaternion{
 	 * @param q2
 	 * @param t		\f$[0,1]\f$
 	 */
-	public void lerp(Quaternion q1, Quaternion q2, double t){
-		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
+	public void lerp(Quaternion q1, Quaternion q2, float t){
+		assert(t >= 0.0f && t <= 1.0f): "t is not in range.";
 		w = q1.w + t * (q2.w - q1.w);
 		x = q1.x + t * (q2.x - q1.x);
 		y = q1.y + t * (q2.y - q1.y);
@@ -541,26 +547,26 @@ public class Quaternion{
 	 *			false: 720度周期で補間を行う(最大回転変化量は 360度)
 	 * allowFlip を true とするとことで最小弧の補間を行い、不要なスピンを低減することができる
 	 */
-	public void slerp(Quaternion q1, Quaternion q2, double t, boolean allowFlip){
-		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
-		boolean flipped = false;		// q1 または q2 の反転を表す
-		double cos_t = q1.inner(q2);
-		if(allowFlip && (cos_t < 0.0)){	// 最小弧で補間を行う
+	public void slerp(Quaternion q1, Quaternion q2, float t, boolean allowFlip){
+		assert(t >= 0.0f && t <= 1.0f): "t is not in range.";
+		boolean flipped = false;			// q1 または q2 の反転を表す
+		float cos_t = q1.inner(q2);
+		if(allowFlip && (cos_t < 0.0f)){	// 最小弧で補間を行う
 			flipped = true;
 			cos_t = -cos_t;
 		}
 
-		double fx, fy;
-		if(DoubleComparer.almostEquals(1.0, Math.abs(cos_t), 1)){
+		float fx, fy;
+		if(FloatComparer.almostEquals(1.0f, Math.abs(cos_t), 1)){
 			// |cosθ| ≈ 1 → sinθ ≈ 0 の時は線形補間に帰着
-			fx = 1.0 - t;
+			fx = 1.0f - t;
 			fy = t;
 		}
 		else{
-			final double theta = Math.acos(cos_t);
-			final double cosec = 1.0 / Math.sin(theta);
-			fx = Math.sin(theta * (1.0 - t)) * cosec;
-			fy = Math.sin(theta * t) * cosec;
+			final float theta = (float)Math.acos(cos_t);
+			final float cosec = 1.0f / (float)Math.sin(theta);
+			fx = (float)Math.sin(theta * (1.0f - t)) * cosec;
+			fy = (float)Math.sin(theta * t) * cosec;
 		}
 		if(flipped){
 			fy = -fy;
@@ -581,11 +587,11 @@ public class Quaternion{
 	 * @param t     \f$[0,1]\f$
 	 * @param temps 作業領域(サイズ 2 を必要とする)
 	 */
-	public void squad(Quaternion p, Quaternion q, Quaternion a, Quaternion b, double t, Quaternion[] temps){
-		assert(t >= 0.0 && t <= 1.0): "t is not in range.";
+	public void squad(Quaternion p, Quaternion q, Quaternion a, Quaternion b, float t, Quaternion[] temps){
+		assert(t >= 0.0f && t <= 1.0f): "t is not in range.";
 		temps[0].slerp(p, q, t, false);
 		temps[1].slerp(a, b, t, false);
-		slerp(temps[0], temps[1], 2*t*(1-t), false);
+		slerp(temps[0], temps[1], 2.0f*t*(1.0f-t), false);
 	}
 
 	/**
@@ -608,9 +614,29 @@ public class Quaternion{
 		temps[1].multiply(this, next);
 		temps[1].ln_u(temps[1]);
 		add(temps[0], temps[1]);
-		multiply(-0.25);
+		multiply(-0.25f);
 		exp_p(this);
 		multiply(current, this);
+	}
+
+	/**
+	 * 回転を表すクォータニオンから回転行列へ変換.
+	 * @param m
+	 */
+	public void ToRotationMatrix(Matrix4f m){
+		final float x_sq = x * x;
+		final float y_sq = y * y;
+		final float z_sq = z * z;
+		final float xy = x * y;
+		final float yz = y * z;
+		final float xz = x * z;
+		final float wx = w * x;
+		final float wy = w * y;
+		final float wz = w * z;
+		m.set(1.0f - 2.0f * (y_sq + z_sq), 2.0f * (xy - wz),            2.0f * (xz + wy),            0.0f,
+			  2.0f * (xy + wz),            1.0f - 2.0f * (x_sq + z_sq), 2.0f * (yz - wx),            0.0f,
+			  2.0f * (xz - wy),            2.0f * (yz + wx),            1.0f - 2.0f * (x_sq + y_sq), 0.0f,
+			  0.0f,                        0.0f,                        0.0f,                        1.0f);
 	}
 
 	@Override

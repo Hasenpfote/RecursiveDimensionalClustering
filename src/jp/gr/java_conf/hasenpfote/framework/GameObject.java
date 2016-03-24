@@ -11,10 +11,10 @@ package jp.gr.java_conf.hasenpfote.framework;
  */
 public class GameObject{
 
-	public double px, py;
-	public double vx, vy;
-	public double m, inv_m;
-	public double r;
+	public float px, py;
+	public float vx, vy;
+	public float m, inv_m;
+	public float r;
 
 	public GameObject(RenderComponent render){
 		this.render = render;

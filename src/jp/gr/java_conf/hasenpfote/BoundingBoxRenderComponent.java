@@ -14,8 +14,8 @@ public class BoundingBoxRenderComponent{
 
 	public void update(BoundingBox box, Graphics2D g2d){
 		//
-		Point2D.Double smin = new Point2D.Double();
-		Point2D.Double smax = new Point2D.Double();
+		Point2D.Float smin = new Point2D.Float();
+		Point2D.Float smax = new Point2D.Float();
 
 		AffineTransform wtos = GameSystem.getInstance().getWorldToScreenMatrix();
 		wtos.transform(box.getMin(), smin);

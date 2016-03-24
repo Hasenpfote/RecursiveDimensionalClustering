@@ -29,15 +29,15 @@ public class CircularPlateRenderComponent{
 		g2d.setTransform(old);
 		g2d.setStroke(olds);
 		//
-		double d = circle.getLinearVelocity().length_squared();
-		if(d > 0.0){
-			d = 1.0 / Math.sqrt(d);
-			double x = circle.getLinearVelocity().x * d;
-			double y = circle.getLinearVelocity().y * d;
-			Point2D.Double src_s = new Point2D.Double(circle.getPosition().x, circle.getPosition().y);
-			Point2D.Double src_e = new Point2D.Double(circle.getPosition().x + x * circle.getRadius(), circle.getPosition().y + y * circle.getRadius());
-			Point2D.Double dst_s = new Point2D.Double();
-			Point2D.Double dst_e = new Point2D.Double();
+		float d = circle.getLinearVelocity().length_squared();
+		if(d > 0.0f){
+			d = 1.0f / (float)Math.sqrt(d);
+			float x = circle.getLinearVelocity().x * d;
+			float y = circle.getLinearVelocity().y * d;
+			Point2D.Float src_s = new Point2D.Float(circle.getPosition().x, circle.getPosition().y);
+			Point2D.Float src_e = new Point2D.Float(circle.getPosition().x + x * circle.getRadius(), circle.getPosition().y + y * circle.getRadius());
+			Point2D.Float dst_s = new Point2D.Float();
+			Point2D.Float dst_e = new Point2D.Float();
 
 			AffineTransform wtos = GameSystem.getInstance().getWorldToScreenMatrix();
 			wtos.transform(src_s, dst_s);

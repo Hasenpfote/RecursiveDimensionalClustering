@@ -8,14 +8,14 @@ import java.awt.geom.Point2D;
  */
 public class BoundingBox{
 
-	private Point2D.Double min;
-	private Point2D.Double max;
+	private Point2D.Float min;
+	private Point2D.Float max;
 
 	public BoundingBox(){
-		min = new Point2D.Double();
-		max = new Point2D.Double();
+		min = new Point2D.Float();
+		max = new Point2D.Float();
 	}
 
-	public Point2D.Double getMin(){ return min; }
-	public Point2D.Double getMax(){ return max; }
+	public Point2D.Float getMin(){ return min; }
+	public Point2D.Float getMax(){ return max; }
 }

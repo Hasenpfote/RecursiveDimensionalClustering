@@ -1,6 +1,6 @@
 package jp.gr.java_conf.hasenpfote.physics;
 
-import jp.gr.java_conf.hasenpfote.math.Vector2d;
+import jp.gr.java_conf.hasenpfote.math.Vector2f;
 
 /**
  * Created by Hasenpfote on 2016/02/01.
@@ -10,7 +10,7 @@ public final class Physics{
 	/**
 	 * gravitational acceleration [m/s^2]
 	 */
-	public static final double G = 9.80665;
+	public static final float G = 9.80665f;
 
 	/**
 	 * 衝突応答
@@ -21,8 +21,8 @@ public final class Physics{
 	 * @param v2	質点2 の速度
 	 * @return 		力積
 	 */
-	public static double calcImpulse(double e, double m1, double m2, double v1, double v2){
-		double I = (m1 * m2) / (m1 + m2) * (1.0 + e) * (v2 - v1);
+	public static float calcImpulse(float e, float m1, float m2, float v1, float v2){
+		float I = (m1 * m2) / (m1 + m2) * (1.0f + e) * (v2 - v1);
 		return I;
 	}
 
@@ -35,9 +35,9 @@ public final class Physics{
 	 * @param v1		質点1 の速度
 	 * @param v2		質点2 の速度
 	 */
-	public static void calcImpulse(Vector2d impulse, double e, double m1, double m2, Vector2d v1, Vector2d v2){
-		impulse.sub(v2, v1);			// relative velocity
-		impulse.mul((m1 * m2) / (m1 + m2) * (1.0 + e));
+	public static void calcImpulse(Vector2f impulse, float e, float m1, float m2, Vector2f v1, Vector2f v2){
+		impulse.subtract(v2, v1);			// relative velocity
+		impulse.multiply((m1 * m2) / (m1 + m2) * (1.0f + e));
 	}
 
 	/**
@@ -50,11 +50,11 @@ public final class Physics{
 	 * @param v1		質点1 の速度
 	 * @param v2		質点2 の速度
 	 */
-	public static void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2){
-		impulse.sub(v2, v1);			// relative velocity
-		double i = impulse.inner(n);	// v12・N
-		double c = (m1 * m2) / (m1 + m2) * (1.0 + e) * i;
-		impulse.mul(n, c);				// I = cN
+	public static void calcImpulse(Vector2f impulse, Vector2f n, float e, float m1, float m2, Vector2f v1, Vector2f v2){
+		impulse.subtract(v2, v1);		// relative velocity
+		float i = impulse.inner(n);		// v12・N
+		float c = (m1 * m2) / (m1 + m2) * (1.0f + e) * i;
+		impulse.multiply(n, c);			// I = cN
 	}
 
 	/**
@@ -69,11 +69,11 @@ public final class Physics{
 	 * @param cd		安定化係数 (0, 1/Δt)
 	 * @param d			めり込み量
 	 */
-	public static void calcImpulse(Vector2d impulse, Vector2d n, double e, double m1, double m2, Vector2d v1, Vector2d v2, double cd, double d){
-		impulse.sub(v2, v1);			// relative velocity
-		double i = impulse.inner(n);	// v12・N
-		double c = (m1 * m2) / (m1 + m2) * ((1.0 + e) * i - cd * d);
-		impulse.mul(n, c);				// I = cN
+	public static void calcImpulse(Vector2f impulse, Vector2f n, float e, float m1, float m2, Vector2f v1, Vector2f v2, float cd, float d){
+		impulse.subtract(v2, v1);		// relative velocity
+		float i = impulse.inner(n);		// v12・N
+		float c = (m1 * m2) / (m1 + m2) * ((1.0f + e) * i - cd * d);
+		impulse.multiply(n, c);			// I = cN
 	}
 
 }

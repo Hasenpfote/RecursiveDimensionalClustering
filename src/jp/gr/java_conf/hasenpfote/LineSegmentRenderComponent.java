@@ -11,10 +11,10 @@ import jp.gr.java_conf.hasenpfote.framework.GameSystem;
  */
 public class LineSegmentRenderComponent{
 
-	public void update(Point2D.Double s, Point2D.Double e, Graphics2D g2d){
+	public void update(Point2D.Float s, Point2D.Float e, Graphics2D g2d){
 		//
-		Point2D.Double _s = new Point2D.Double();
-		Point2D.Double _e = new Point2D.Double();
+		Point2D.Float _s = new Point2D.Float();
+		Point2D.Float _e = new Point2D.Float();
 
 		AffineTransform wtos = GameSystem.getInstance().getWorldToScreenMatrix();
 		wtos.transform(s, _s);

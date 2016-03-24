@@ -5,7 +5,7 @@ package jp.gr.java_conf.hasenpfote.math;
  */
 public final class QQuaternion{
 
-	private static final double SQRT2 = Math.sqrt(2.0);
+	private static final float SQRT2 = (float)Math.sqrt(2.0);
 
 	/**
 	 * 最大な成分の絶対値のインデクスを取得.
@@ -14,8 +14,8 @@ public final class QQuaternion{
 	 */
 	private static int getIndexByAbsMax(Quaternion q){
 		int index = 0;
-		double max = Math.abs(q.w);
-		double abs = Math.abs(q.x);
+		float max = Math.abs(q.w);
+		float abs = Math.abs(q.x);
 		if(abs > max){
 			index = 1;
 			max = abs;
@@ -35,11 +35,10 @@ public final class QQuaternion{
 	/**
 	 * 量子化.
 	 * <pre>
-	 * [62 - 63]bits: unuse<br>
-	 * [60 - 61]bits: specifying the max component among X, Y, Z, W.<br>
-	 * [40 - 59]bits: component1<br>
-	 * [20 - 39]bits: component2<br>
-	 * [ 0 - 19]bits: component3
+	 * [30 - 31]bits: specifying the max component among X, Y, Z, W.<br>
+	 * [20 - 29]bits: component1<br>
+	 * [10 - 19]bits: component2<br>
+	 * [ 0 -  9]bits: component3
 	 * </pre>
 	 * @param index	specifying the max component among X, Y, Z, W.
 	 * @param c1	component1.
@@ -47,11 +46,11 @@ public final class QQuaternion{
 	 * @param c3	component3.
 	 * @return
 	 */
-	private static long quantize(int index, double c1, double c2, double c3){
-		return ((long)index << 60)
-				| ((long)(Util.clamp(c1 * SQRT2 * 0.5 + 0.5, 0.0, 1.0) * 0xfffff) << 40)
-				| ((long)(Util.clamp(c2 * SQRT2 * 0.5 + 0.5, 0.0, 1.0) * 0xfffff) << 20)
-				| ((long)(Util.clamp(c3 * SQRT2 * 0.5 + 0.5, 0.0, 1.0) * 0xfffff));
+	private static int quantize(int index, float c1, float c2, float c3){
+		return (index << 30)
+				| ((int)(Util.clamp(c1 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 20)
+				| ((int)(Util.clamp(c2 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 10)
+				| ((int)(Util.clamp(c3 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF));
 	}
 
 	/**
@@ -59,22 +58,22 @@ public final class QQuaternion{
 	 * @param q		an unit quaternion.
 	 * @return
 	 */
-	public static long compress(Quaternion q){
-		assert(DoubleComparer.almostEquals(1.0, q.norm(), 1)): "q is not an unit quaternion.";
-		long result = 0L;
+	public static int compress(Quaternion q){
+		assert(FloatComparer.almostEquals(1.0f, q.norm(), 1)): "q is not an unit quaternion.";
+		int result = 0;
 		int index = getIndexByAbsMax(q);
 		switch(index){
 			case 0:
-				result = (q.w < 0)? quantize(index, -q.x, -q.y, -q.z) : quantize(index, q.x, q.y, q.z);
+				result = (q.w < 0.0f)? quantize(index, -q.x, -q.y, -q.z) : quantize(index, q.x, q.y, q.z);
 				break;
 			case 1:
-				result = (q.x < 0)? quantize(index, -q.w, -q.y, -q.z) : quantize(index, q.w, q.y, q.z);
+				result = (q.x < 0.0f)? quantize(index, -q.w, -q.y, -q.z) : quantize(index, q.w, q.y, q.z);
 				break;
 			case 2:
-				result = (q.y < 0)? quantize(index, -q.w, -q.x, -q.z) : quantize(index, q.w, q.x, q.z);
+				result = (q.y < 0.0f)? quantize(index, -q.w, -q.x, -q.z) : quantize(index, q.w, q.x, q.z);
 				break;
 			case 3:
-				result = (q.z < 0)? quantize(index, -q.w, -q.x, -q.y) : quantize(index, q.w, q.x, q.y);
+				result = (q.z < 0.0f)? quantize(index, -q.w, -q.x, -q.y) : quantize(index, q.w, q.x, q.y);
 				break;
 			default:
 				break;
@@ -82,20 +81,20 @@ public final class QQuaternion{
 		return result;
 	}
 
-	private static int getIndex(long qq){
-		return (int)((qq & 0x3000000000000000L) >> 60);
+	private static int getIndex(int qq){
+		return ((qq & 0xC0000000) >>> 30);
 	}
 
-	private static double getComponent1(long qq){
-		return ((double)((qq & 0x0FFFFF0000000000L) >> 40) / 0xfffff - 0.5) * 2.0 / SQRT2;
+	private static float getComponent1(int qq){
+		return ((float)((qq & 0x3FF00000) >> 20) / 0x3FF - 0.5f) * 2.0f / SQRT2;
 	}
 
-	private static double getComponent2(long qq){
-		return ((double)((qq & 0x000000FFFFF00000L) >> 20) / 0xfffff - 0.5) * 2.0 / SQRT2;
+	private static float getComponent2(int qq){
+		return ((float)((qq & 0x000FFC00) >> 10) / 0x3FF - 0.5f) * 2.0f / SQRT2;
 	}
 
-	private static double getComponent3(long qq){
-		return ((double)(qq & 0x00000000000FFFFFL) / 0xfffff - 0.5) * 2.0 / SQRT2;
+	private static float getComponent3(int qq){
+		return ((float)(qq & 0x000003FF) / 0x3FF - 0.5f) * 2.0f / SQRT2;
 	}
 
 	/**
@@ -103,32 +102,32 @@ public final class QQuaternion{
 	 * @param q
 	 * @param qq
 	 */
-	public static void decompress(Quaternion q, long qq){
+	public static void decompress(Quaternion q, int qq){
 		int index  = getIndex(qq);
 		switch(index){
 			case 0:
 				q.x = getComponent1(qq);
 				q.y = getComponent2(qq);
 				q.z = getComponent3(qq);
-				q.w = Math.sqrt(1.0 - q.x * q.x - q.y * q.y - q.z * q.z);
+				q.w = (float)Math.sqrt(1.0f - q.x * q.x - q.y * q.y - q.z * q.z);
 				break;
 			case 1:
 				q.w = getComponent1(qq);
 				q.y = getComponent2(qq);
 				q.z = getComponent3(qq);
-				q.x = Math.sqrt(1.0 - q.w * q.w - q.y * q.y - q.z * q.z);
+				q.x = (float)Math.sqrt(1.0f - q.w * q.w - q.y * q.y - q.z * q.z);
 				break;
 			case 2:
 				q.w = getComponent1(qq);
 				q.x = getComponent2(qq);
 				q.z = getComponent3(qq);
-				q.y = Math.sqrt(1.0 - q.w * q.w - q.x * q.x - q.z * q.z);
+				q.y = (float)Math.sqrt(1.0f - q.w * q.w - q.x * q.x - q.z * q.z);
 				break;
 			case 3:
 				q.w = getComponent1(qq);
 				q.x = getComponent2(qq);
 				q.y = getComponent3(qq);
-				q.z = Math.sqrt(1.0 - q.w * q.w - q.x * q.x - q.y * q.y);
+				q.z = (float)Math.sqrt(1.0f - q.w * q.w - q.x * q.x - q.y * q.y);
 				break;
 			default:
 				break;

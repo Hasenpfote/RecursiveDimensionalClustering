@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
-import jp.gr.java_conf.hasenpfote.math.Vector2d;
+import jp.gr.java_conf.hasenpfote.math.Vector2f;
 
 
 /**
@@ -24,7 +24,7 @@ public final class Rdc{
 	/** 分割の閾値 */
 	private static final int SUBDIVISION_THRESHOLD = 4;		// >= 3
 	/** 境界の閾値 */
-	private static final double CONTACT_THRESHOLD = 0.001;
+	private static final float CONTACT_THRESHOLD = 0.001f;
 	/** 最大再帰深度(>= 2) */
 	private static final int MAX_DEPTH = 6;	// x, y, x, y, x, y
 	/** 最大処理オブジェクト数(初期許容量に影響) */
@@ -84,7 +84,7 @@ public final class Rdc{
 					e = x_axis_open_entities.get(object);
 				}
 				else{
-					double x = object.getPosition().x - object.getRadius();
+					float x = object.getPosition().x - object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.OPEN,  x + CONTACT_THRESHOLD);
 					x_axis_open_entities.put(object, e);
@@ -95,7 +95,7 @@ public final class Rdc{
 					e = x_axis_close_entities.get(object);
 				}
 				else{
-					double x = object.getPosition().x + object.getRadius();
+					float x = object.getPosition().x + object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.CLOSE, x - CONTACT_THRESHOLD);
 					x_axis_close_entities.put(object, e);
@@ -110,7 +110,7 @@ public final class Rdc{
 					e = y_axis_open_entities.get(object);
 				}
 				else{
-					double y = object.getPosition().y - object.getRadius();
+					float y = object.getPosition().y - object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.OPEN,  y + CONTACT_THRESHOLD);
 					y_axis_open_entities.put(object, e);
@@ -121,7 +121,7 @@ public final class Rdc{
 					e = y_axis_close_entities.get(object);
 				}
 				else{
-					double y = object.getPosition().y + object.getRadius();
+					float y = object.getPosition().y + object.getRadius();
 					e = entity_pool.allocate();
 					e.set(object, Entity.Boundary.CLOSE, y - CONTACT_THRESHOLD);
 					y_axis_close_entities.put(object, e);
@@ -229,12 +229,12 @@ public final class Rdc{
 		}
 		private CircularPlate object;
 		private Boundary boundary;
-		private double position;
+		private float position;
 
 		public Entity(){
 		}
 
-		public void set(CircularPlate object, Boundary boundary, double position){
+		public void set(CircularPlate object, Boundary boundary, float position){
 			this.object = object;
 			this.boundary = boundary;
 			this.position = position;
@@ -242,15 +242,7 @@ public final class Rdc{
 
 		@Override
 		public int compareTo(Entity o) {
-			/*
-			double diff = position - o.position;
-			if(diff < 0.0)
-				return -1;
-			if(diff > 0.0)
-				return 1;
-			return 0;
-			*/
-			return Double.compare(position, o.position);
+			return Float.compare(position, o.position);
 		}
 	}
 
@@ -292,13 +284,13 @@ public final class Rdc{
 		public void updateBoundingBox(){
 			CircularPlate object = group.get(0);
 
-			Vector2d position = object.getPosition();
-			double radius = object.getRadius();
-			double min_x = position.x - radius;
-			double min_y = position.y - radius;
-			double max_x = position.x + radius;
-			double max_y = position.y + radius;
-			double value;
+			Vector2f position = object.getPosition();
+			float radius = object.getRadius();
+			float min_x = position.x - radius;
+			float min_y = position.y - radius;
+			float max_x = position.x + radius;
+			float max_y = position.y + radius;
+			float value;
 
 			int size = group.size();
 			for(int i = 1; i < size; i++){

@@ -5,16 +5,17 @@ package jp.gr.java_conf.hasenpfote.math;
  */
 public class ComplexNumber{
 
-	public double re, im;
+	public float re;
+	public float im;
 
 	public ComplexNumber(){
 	}
 
-	public ComplexNumber(double re, double im){
+	public ComplexNumber(float re, float im){
 		set(re, im);
 	}
 
-	public void set(double re, double im){
+	public void set(float re, float im){
 		this.re = re;
 		this.im = im;
 	}
@@ -24,18 +25,18 @@ public class ComplexNumber{
 	 * @param rho
 	 * @param theta
 	 */
-	public void polar(double rho, double theta){
-		re = rho * Math.cos(theta);
-		im = rho * Math.sin(theta);
+	public void polar(float rho, float theta){
+		re = rho * (float)Math.cos(theta);
+		im = rho * (float)Math.sin(theta);
 	}
 
 	public void zero(){
-		re = im = 0.0;
+		re = im = 0.0f;
 	}
 
 	public void identity(){
-		re = 1.0;
-		im = 0.0;
+		re = 1.0f;
+		im = 0.0f;
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class ComplexNumber{
 	 * @param c
 	 * @param s
 	 */
-	public void multiply(ComplexNumber c, double s){
+	public void multiply(ComplexNumber c, float s){
 		re = c.re * s;
 		im = c.im * s;
 	}
@@ -92,9 +93,10 @@ public class ComplexNumber{
 	 * @param c
 	 * @param s
 	 */
-	public void divide(ComplexNumber c, double s){
-		assert(Math.abs(s) > 0.0): "division by zero.";
-		multiply(c, 1.0 / s);
+	public void divide(ComplexNumber c, float s){
+		assert(Math.abs(s) > 0.0f): "division by zero.";
+		re = c.re / s;
+		im = c.im / s;
 	}
 
 	/**
@@ -102,9 +104,9 @@ public class ComplexNumber{
 	 * @param c
 	 */
 	public void inverse(ComplexNumber c){
-		double norm_sq = c.normSquared();
-		assert(norm_sq > 0.0): "division by zero.";
-		norm_sq = 1.0 / norm_sq;
+		float norm_sq = c.normSquared();
+		assert(norm_sq > 0.0f): "division by zero.";
+		norm_sq = 1.0f / norm_sq;
 		re =  c.re * norm_sq;
 		im = -c.im * norm_sq;
 	}
@@ -113,7 +115,7 @@ public class ComplexNumber{
 	 * ノルムの二乗.
 	 * @return
 	 */
-	public double normSquared(){
+	public float normSquared(){
 		return re * re + im * im;
 	}
 
@@ -121,8 +123,8 @@ public class ComplexNumber{
 	 * ノルム.
 	 * @return
 	 */
-	public double norm(){
-		return Math.sqrt(normSquared());
+	public float norm(){
+		return (float)Math.sqrt(normSquared());
 	}
 
 	/**
@@ -138,8 +140,8 @@ public class ComplexNumber{
 	 * 偏角.
 	 * @return
 	 */
-	public double argument(){
-		return Math.atan2(im, re);
+	public float argument(){
+		return (float)Math.atan2(im, re);
 	}
 
 	/**
@@ -147,9 +149,9 @@ public class ComplexNumber{
 	 * @param base
 	 * @param exponent
 	 */
-	public void pow(ComplexNumber base, double exponent){
-		final double rho = Math.pow(base.norm(), exponent);
-		final double arg = base.argument() * exponent;
+	public void pow(ComplexNumber base, float exponent){
+		final float rho = (float)Math.pow(base.norm(), exponent);
+		final float arg = base.argument() * exponent;
 		polar(rho, arg);
 	}
 
@@ -166,7 +168,7 @@ public class ComplexNumber{
 	 * @param c
 	 */
 	public void ln(ComplexNumber c){
-		re = Math.log(c.norm());
+		re = (float)Math.log(c.norm());
 		im = c.argument();
 	}
 
@@ -175,16 +177,16 @@ public class ComplexNumber{
 	 * @param lnc
 	 */
 	public void exp(ComplexNumber lnc){
-		polar(Math.exp(lnc.re), lnc.im);
+		polar((float)Math.exp(lnc.re), lnc.im);
 	}
 
 	/**
 	 * 回転を表す複素数を生成.
 	 * @param angle
 	 */
-	public void rotation(double angle){
-		re = Math.cos(angle);
-		im = Math.sin(angle);
+	public void rotation(float angle){
+		re = (float)Math.cos(angle);
+		im = (float)Math.sin(angle);
 	}
 
 	@Override
