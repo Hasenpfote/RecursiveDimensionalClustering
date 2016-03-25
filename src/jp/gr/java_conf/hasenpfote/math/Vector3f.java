@@ -289,6 +289,28 @@ public class Vector3f {
 		}
 	}
 
+	/**
+	 * m と v の積.
+	 * @param m
+	 * @param v
+	 */
+	public void multiply(CMatrix4f m, Vector3f v){
+		x = m.m11 * v.x + m.m12 * v.y + m.m13 * v.z + m.m14;
+		y = m.m21 * v.x + m.m22 * v.y + m.m23 * v.z + m.m24;
+		z = m.m31 * v.x + m.m32 * v.y + m.m33 * v.z + m.m34;
+	}
+
+	/**
+	 * v と m の積.
+	 * @param v
+	 * @param m
+	 */
+	public void multiply(Vector3f v, RMatrix4f m){
+		x = v.x * m.m11 + v.y * m.m21 + v.z * m.m31 + m.m41;
+		y = v.x * m.m12 + v.y * m.m22 + v.z * m.m32 + m.m42;
+		z = v.x * m.m13 + v.y * m.m23 + v.z * m.m33 + m.m43;
+	}
+
 	@Override
 	public String toString(){
 		return "Vector3f{" + "x=" + x + ", y=" + y + ", z=" + z + '}';

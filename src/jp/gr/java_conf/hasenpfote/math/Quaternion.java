@@ -623,7 +623,7 @@ public class Quaternion{
 	 * 回転を表すクォータニオンから回転行列へ変換.
 	 * @param m
 	 */
-	public void ToRotationMatrix(Matrix4f m){
+	public void ToRotationMatrix(CMatrix4f m){
 		final float x_sq = x * x;
 		final float y_sq = y * y;
 		final float z_sq = z * z;
@@ -636,6 +636,26 @@ public class Quaternion{
 		m.set(1.0f - 2.0f * (y_sq + z_sq), 2.0f * (xy - wz),            2.0f * (xz + wy),            0.0f,
 			  2.0f * (xy + wz),            1.0f - 2.0f * (x_sq + z_sq), 2.0f * (yz - wx),            0.0f,
 			  2.0f * (xz - wy),            2.0f * (yz + wx),            1.0f - 2.0f * (x_sq + y_sq), 0.0f,
+			  0.0f,                        0.0f,                        0.0f,                        1.0f);
+	}
+
+	/**
+	 * 回転を表すクォータニオンから回転行列へ変換.
+	 * @param m
+	 */
+	public void ToRotationMatrix(RMatrix4f m){
+		final float x_sq = x * x;
+		final float y_sq = y * y;
+		final float z_sq = z * z;
+		final float xy = x * y;
+		final float yz = y * z;
+		final float xz = x * z;
+		final float wx = w * x;
+		final float wy = w * y;
+		final float wz = w * z;
+		m.set(1.0f - 2.0f * (y_sq + z_sq), 2.0f * (xy + wz),            2.0f * (xz - wy),            0.0f,
+			  2.0f * (xy - wz),            1.0f - 2.0f * (x_sq + z_sq), 2.0f * (yz + wx),            0.0f,
+			  2.0f * (xz + wy),            2.0f * (yz - wx),            1.0f - 2.0f * (x_sq + y_sq), 0.0f,
 			  0.0f,                        0.0f,                        0.0f,                        1.0f);
 	}
 
