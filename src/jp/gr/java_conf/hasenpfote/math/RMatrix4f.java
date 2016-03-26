@@ -284,6 +284,88 @@ public class RMatrix4f {
 		}
 	}
 
+	/**
+	 * 左手座標系のビュー行列を生成.
+	 * @param position	位置
+	 * @param target	注視点
+	 * @param up		ワールドの上方向
+	 */
+	public void lookAt(Vector3f position, Vector3f target, Vector3f up){
+		Vector3f zaxis = new Vector3f();
+		zaxis.subtract(target, position);
+		zaxis.normalize();
+
+		Vector3f xaxis = new Vector3f();
+		xaxis.cross(up, zaxis);
+		xaxis.normalize();
+
+		Vector3f yaxis = new Vector3f();
+		yaxis.cross(zaxis, xaxis);
+
+		set(xaxis.x,                yaxis.x,                zaxis.x,                0.0f,
+			xaxis.y,                yaxis.y,                zaxis.y,                0.0f,
+			xaxis.z,                yaxis.z,                zaxis.z,                0.0f,
+			-xaxis.inner(position), -yaxis.inner(position), -zaxis.inner(position), 1.0f);
+	}
+
+	/**
+	 * 左手座標系の射影行列を生成(like a Direct3D).
+	 * @param fovy			total field of view in the YZ plane.(an angle in radians.)
+	 * @param aspectRatio	aspect ratio of view window.(width:height)
+	 * @param near			positive distance from camera to near clipping plane.
+	 * @param far			positive distance from camera to far clipping plane.
+	 */
+	public void perspective(float fovy, float aspectRatio, float near, float far){
+		final float cot = 1.0f / (float)Math.tan(fovy * 0.5f);
+		final float q = far / (far - near);
+		set(cot / aspectRatio, 0.0f, 0.0f,      0.0f,
+			0.0f,              cot,  0.0f,      0.0f,
+			0.0f,              0.0f, q,         1.0f,
+			0.0f,		       0.0f, -near * q, 0.0f);
+	}
+
+	/**
+	 * 左手座標系の射影行列を生成(like a Direct3D).
+	 * @param top		top of view volume at the near clipping plane.
+	 * @param bottom	bottom of view volume at the near clipping plane.
+	 * @param left		left of view volume at the near clipping plane.
+	 * @param right     right of view volume at the near clipping plane.
+	 * @param near		positive distance from camera to near clipping plane.
+	 * @param far		positive distance from camera to far clipping plane.
+	 */
+	public void frustum(float top, float bottom, float left, float right, float near, float far){
+		final float w = 2.0f * near / (right - left);
+		final float h = 2.0f * near / (top - bottom);
+		final float q = far / (far - near);
+		final float woff = -(right + left) / (right - left);
+		final float hoff = -(top + bottom) / (top - bottom);
+		set(w,    0.0f, 0.0f,      0.0f,
+			0.0f, h,    0.0f,      0.0f,
+			woff, hoff, q,         1.0f,
+			0.0f, 0.0f, -near * q, 0.0f);
+	}
+
+	/**
+	 * 左手座標系の正射影行列を生成(like a Direct3D).
+	 * @param top		top of parallel view volume.
+	 * @param bottom	bottom of parallel view volume.
+	 * @param left		left of parallel view volume.
+	 * @param right		right of parallel view volume.
+	 * @param near		positive distance from camera to near clipping plane.
+	 * @param far		positive distance from camera to far clipping plane.
+	 */
+	public void ortho(float top, float bottom, float left, float right, float near, float far){
+		final float w = 2.0f / (right - left);
+		final float h = 2.0f / (top - bottom);
+		final float q = 1.0f / (far - near);
+		final float woff = -(right + left) / (right - left);
+		final float hoff = -(top + bottom) / (top - bottom);
+		set(w,    0.0f, 0.0f,      0.0f,
+			0.0f, h,    0.0f,      0.0f,
+			0.0f, 0.0f, q,         0.0f,
+			woff, hoff, -near * q, 1.0f);
+	}
+
 	@Override
 	public String toString() {
 		String sep = System.lineSeparator();
