@@ -251,6 +251,24 @@ public final class Vector2f {
 		}
 	}
 
+	/**
+	 * 重心座標の点を計算.
+	 * <p>\f$ (1 - f - g)\vec{V_1} + f\vec{V_2} + g\vec{V_3}\f$</p>
+	 * <p>(f >= 0 && g >= 0 && 1 - f - g >= 0) ならば、点は三角形の中にある.</p>
+	 * <p>(f == 0 && g >= 0 && 1 - f - g >= 0) ならば、点は線分 v1v3 上にある.</p>
+	 * <p>(f >= 0 && g == 0 && 1 - f - g >= 0) ならば、点は線分 v1v2 上にある.</p>
+	 * <p>(f >= 0 && g >= 0 && 1 - f - g == 0) ならば、点は線分 v2v3 上にある.</p>
+	 * @param v1
+	 * @param v2
+	 * @param v3
+	 * @param f     v2 に対する重み係数.
+	 * @param g     v3 に対する重み係数.
+	 */
+	public void BaryCentric(Vector2f v1, Vector2f v2, Vector2f v3, float f, float g){
+		x = v1.x + f * (v2.x - v1.x) + g * (v3.x - v1.x);
+		y = v1.y + f * (v2.y - v1.y) + g * (v3.y - v1.y);
+	}
+
 	@Override
 	public String toString(){
 		return "Vector2f{" + "x=" + x + ", y=" + y + '}';

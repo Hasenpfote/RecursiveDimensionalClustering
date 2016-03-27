@@ -290,6 +290,25 @@ public class Vector3f {
 	}
 
 	/**
+	 * 重心座標の点を計算.
+	 * <p>\f$ (1 - f - g)\vec{V_1} + f\vec{V_2} + g\vec{V_3}\f$</p>
+	 * <p>(f >= 0 && g >= 0 && 1 - f - g >= 0) ならば、点は三角形の中にある.</p>
+	 * <p>(f == 0 && g >= 0 && 1 - f - g >= 0) ならば、点は線分 v1v3 上にある.</p>
+	 * <p>(f >= 0 && g == 0 && 1 - f - g >= 0) ならば、点は線分 v1v2 上にある.</p>
+	 * <p>(f >= 0 && g >= 0 && 1 - f - g == 0) ならば、点は線分 v2v3 上にある.</p>
+	 * @param v1
+	 * @param v2
+	 * @param v3
+	 * @param f     v2 に対する重み係数.
+	 * @param g     v3 に対する重み係数.
+	 */
+	public void BaryCentric(Vector3f v1, Vector3f v2, Vector3f v3, float f, float g){
+		x = v1.x + f * (v2.x - v1.x) + g * (v3.x - v1.x);
+		y = v1.y + f * (v2.y - v1.y) + g * (v3.y - v1.y);
+		z = v1.z + f * (v2.z - v1.z) + g * (v3.z - v1.z);
+	}
+
+	/**
 	 * m と v の積.
 	 * @param m
 	 * @param v
@@ -309,6 +328,27 @@ public class Vector3f {
 		x = v.x * m.m11 + v.y * m.m21 + v.z * m.m31 + m.m41;
 		y = v.x * m.m12 + v.y * m.m22 + v.z * m.m32 + m.m42;
 		z = v.x * m.m13 + v.y * m.m23 + v.z * m.m33 + m.m43;
+	}
+
+	/**
+	 * v を q で回転.
+	 * <p>\f$\vec{v'} = q\vec{v}q^{-1}\f$</p>
+	 * @param v
+	 * @param q
+	 */
+	public void rotate(Vector3f v, Quaternion q){
+		final float x_sq = q.x * q.x;
+		final float y_sq = q.y * q.y;
+		final float z_sq = q.z * q.z;
+		final float xy = q.x * q.y;
+		final float yz = q.y * q.z;
+		final float xz = q.x * q.z;
+		final float wx = q.w * q.x;
+		final float wy = q.w * q.y;
+		final float wz = q.w * q.z;
+		x = (1.0f - 2.0f * (y_sq + z_sq)) * v.x + (2.0f * (xy - wz)) * v.y + (2.0f * (xz + wy)) * v.z;
+		y = (2.0f * (xy + wz)) * v.x + (1.0f - 2.0f * (x_sq + z_sq)) * v.y + (2.0f * (yz - wx)) * v.z;
+		z = (2.0f * (xz - wy)) * v.x + (2.0f * (yz + wx)) * v.y + (1.0f - 2.0f * (x_sq + y_sq)) * v.z;
 	}
 
 	@Override
