@@ -1,6 +1,6 @@
 package jp.gr.java_conf.hasenpfote;
 
-import jp.gr.java_conf.hasenpfote.math.Util;
+import jp.gr.java_conf.hasenpfote.math.MathUtil;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -29,9 +29,9 @@ public class RdcRenderComponent{
 		for(Rdc.Cluster cluster : clusters){
 			int size = cluster.getGroup().size();
 			num_objects += size;
-			num_combinations += (size > 2)? Util.combination(size, 2) : 1;
+			num_combinations += (size > 2)? MathUtil.combination(size, 2) : 1;
 		}
-		long max_combinations = (num_objects > 2)? Util.combination(num_objects, 2) : ((num_objects == 0)? 0 : 1);
+		long max_combinations = (num_objects > 2)? MathUtil.combination(num_objects, 2) : ((num_objects == 0)? 0 : 1);
 		//
 		FontMetrics metrics = g2d.getFontMetrics();
 		g2d.setColor(Color.YELLOW);

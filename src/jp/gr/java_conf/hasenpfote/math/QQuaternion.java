@@ -48,9 +48,9 @@ public final class QQuaternion{
 	 */
 	private static int quantize(int index, float c1, float c2, float c3){
 		return (index << 30)
-				| ((int)(Util.clamp(c1 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 20)
-				| ((int)(Util.clamp(c2 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 10)
-				| ((int)(Util.clamp(c3 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF));
+				| ((int)(MathUtil.clamp(c1 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 20)
+				| ((int)(MathUtil.clamp(c2 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF) << 10)
+				| ((int)(MathUtil.clamp(c3 * SQRT2 * 0.5f + 0.5f, 0.0f, 1.0f) * 0x3FF));
 	}
 
 	/**
