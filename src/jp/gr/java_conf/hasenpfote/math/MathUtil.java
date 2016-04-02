@@ -3,7 +3,9 @@ package jp.gr.java_conf.hasenpfote.math;
 /**
  * Created by Hasenpfote on 2016/01/29.
  */
-public final class MathUtil {
+public final class MathUtil{
+
+	private MathUtil(){}
 
 	/**
 	 * clamp
@@ -33,6 +35,32 @@ public final class MathUtil {
 		if(value > max)
 			return max;
 		return value;
+	}
+
+	/**
+	 * 閉区間に含まれるか.
+	 * @param value
+	 * @param lower	下限
+	 * @param upper	上限
+	 * @return
+	 */
+	public static boolean containsClosed(float value, float lower, float upper){
+		if(value < lower || value > upper)
+			return false;
+		return true;
+	}
+
+	/**
+	 * 開区間に含まれるか.
+	 * @param value
+	 * @param lower	下限
+	 * @param upper	上限
+	 * @return
+	 */
+	public static boolean containsOpen(float value, float lower, float upper){
+		if(value <= lower || value >= upper)
+			return false;
+		return true;
 	}
 
 	/**
@@ -67,13 +95,13 @@ public final class MathUtil {
 
 	/**
 	 * 二次方程式の求根.
+	 * @param roots	根.(サイズ 2 を必要とする)
 	 * @param a
 	 * @param b
 	 * @param c
-	 * @param roots	根.(サイズ 2 を必要とする)
-	 * @return
+	 * @return -1 なら虚根、0 なら重根、1 なら実数根.
 	 */
-	public static int solveQuadratic(float a, float b, float c, float[] roots){
+	public static int solveQuadratic(float[] roots, float a, float b, float c){
 		final float discriminant = b * b - 4.0f * a * c;
 		if(discriminant < 0.0f)	// equation has imaginary roots.
 			return -1;
@@ -98,5 +126,4 @@ public final class MathUtil {
 		roots[0] = (b < 0.0f)? x : -x;
 		return 0;
 	}
-
 }

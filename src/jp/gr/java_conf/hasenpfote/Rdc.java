@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import jp.gr.java_conf.hasenpfote.framework.ObjectPool;
-import jp.gr.java_conf.hasenpfote.math.Vector2f;
+import jp.gr.java_conf.hasenpfote.math.Vector2;
 
 
 /**
@@ -284,7 +284,7 @@ public final class Rdc{
 		public void updateBoundingBox(){
 			CircularPlate object = group.get(0);
 
-			Vector2f position = object.getPosition();
+			Vector2 position = object.getPosition();
 			float radius = object.getRadius();
 			float min_x = position.x - radius;
 			float min_y = position.y - radius;

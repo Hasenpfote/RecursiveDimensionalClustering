@@ -24,7 +24,7 @@ public class Quaternion{
 		set(w, x, y, z);
 	}
 
-	public Quaternion(float s, Vector3f v){
+	public Quaternion(float s, Vector3 v){
 		set(s, v);
 	}
 
@@ -42,7 +42,7 @@ public class Quaternion{
 		this.z = z;
 	}
 
-	public void set(float s, Vector3f v){
+	public void set(float s, Vector3 v){
 		w = s;
 		x = v.x;
 		y = v.y;
@@ -463,7 +463,7 @@ public class Quaternion{
 	 * @param axis		an unit vector.
 	 * @param angle		an angle in radians.
 	 */
-	public void rotationAxis(Vector3f axis, float angle){
+	public void rotationAxis(Vector3 axis, float angle){
 		assert(FloatComparer.almostEquals(1.0f, axis.length(), 1)): "axis is not an unit quaternion.";
 		final float half_angle = angle * 0.5f;
 		final float s = (float)Math.sin(half_angle);
@@ -478,7 +478,7 @@ public class Quaternion{
 	 * @param v1	an unit vector.
 	 * @param v2	an unit vector.
 	 */
-	public void rotationShortestArc(Vector3f v1, Vector3f v2){
+	public void rotationShortestArc(Vector3 v1, Vector3 v2){
 		final float d = v1.inner(v2);
 		final float s = (float)Math.sqrt((1.0f + d) * 2.0f);
 		w = s * 0.5f;
@@ -505,7 +505,7 @@ public class Quaternion{
 	 * @param axis
 	 * @return	an angle in radians.
 	 */
-	public float ToAxisAngle(Vector3f axis){
+	public float ToAxisAngle(Vector3 axis){
 		assert(FloatComparer.almostEquals(1.0f, norm(), 1)): "quaternion is not an unit quaternion.";
 		float i = normV();
 		if(i > 0.0f){	// TODO: 少し余裕を持たせる
@@ -623,7 +623,7 @@ public class Quaternion{
 	 * 回転を表すクォータニオンから回転行列へ変換.
 	 * @param m
 	 */
-	public void ToRotationMatrix(CMatrix4f m){
+	public void ToRotationMatrix(CMatrix4 m){
 		final float x_sq = x * x;
 		final float y_sq = y * y;
 		final float z_sq = z * z;
@@ -643,7 +643,7 @@ public class Quaternion{
 	 * 回転を表すクォータニオンから回転行列へ変換.
 	 * @param m
 	 */
-	public void ToRotationMatrix(RMatrix4f m){
+	public void ToRotationMatrix(RMatrix4 m){
 		final float x_sq = x * x;
 		final float y_sq = y * y;
 		final float z_sq = z * z;

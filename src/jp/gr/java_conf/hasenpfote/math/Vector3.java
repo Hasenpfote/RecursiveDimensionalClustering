@@ -3,33 +3,33 @@ package jp.gr.java_conf.hasenpfote.math;
 /**
  * Created by Hasenpfote on 2016/02/16.
  */
-public class Vector3f {
+public class Vector3 {
 
-	public static final Vector3f ZERO = new Vector3f(0.0f, 0.0f, 0.0f);
-	public static final Vector3f E1 = new Vector3f(1.0f, 0.0f, 0.0f);
-	public static final Vector3f E2 = new Vector3f(0.0f, 1.0f, 0.0f);
-	public static final Vector3f E3 = new Vector3f(0.0f, 0.0f, 1.0f);
+	public static final Vector3 ZERO = new Vector3(0.0f, 0.0f, 0.0f);
+	public static final Vector3 E1 = new Vector3(1.0f, 0.0f, 0.0f);
+	public static final Vector3 E2 = new Vector3(0.0f, 1.0f, 0.0f);
+	public static final Vector3 E3 = new Vector3(0.0f, 0.0f, 1.0f);
 
 	public float x;
 	public float y;
 	public float z;
 
-	public Vector3f(){
+	public Vector3(){
 	}
 
-	public Vector3f(Vector3f v){
+	public Vector3(Vector3 v){
 		set(v);
 	}
 
-	public Vector3f(float x, float y, float z){
+	public Vector3(float x, float y, float z){
 		set(x, y, z);
 	}
 
-	public Vector3f(float[] v){
+	public Vector3(float[] v){
 		set(v);
 	}
 
-	public void set(Vector3f v){
+	public void set(Vector3 v){
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
@@ -51,7 +51,7 @@ public class Vector3f {
 	 * v を加算代入
 	 * @param v
 	 */
-	public void add(Vector3f v){
+	public void add(Vector3 v){
 		add(this, v);
 	}
 
@@ -60,7 +60,7 @@ public class Vector3f {
 	 * @param v1
 	 * @param v2
 	 */
-	public void add(Vector3f v1, Vector3f v2){
+	public void add(Vector3 v1, Vector3 v2){
 		x = v1.x + v2.x;
 		y = v1.y + v2.y;
 		z = v1.z + v2.z;
@@ -71,7 +71,7 @@ public class Vector3f {
 	 * @param v
 	 * @param s
 	 */
-	public void madd(Vector3f v, float s){
+	public void madd(Vector3 v, float s){
 		x += v.x * s;
 		y += v.y * s;
 		z += v.z * s;
@@ -81,7 +81,7 @@ public class Vector3f {
 	 * 減算代入
 	 * @param v
 	 */
-	public void subtract(Vector3f v){
+	public void subtract(Vector3 v){
 		subtract(this, v);
 	}
 
@@ -90,7 +90,7 @@ public class Vector3f {
 	 * @param v1
 	 * @param v2
 	 */
-	public void subtract(Vector3f v1, Vector3f v2){
+	public void subtract(Vector3 v1, Vector3 v2){
 		x = v1.x - v2.x;
 		y = v1.y - v2.y;
 		z = v1.z - v2.z;
@@ -101,7 +101,7 @@ public class Vector3f {
 	 * @param v
 	 * @param s
 	 */
-	public void msub(Vector3f v, float s){
+	public void msub(Vector3 v, float s){
 		x -= v.x * s;
 		y -= v.y * s;
 		z -= v.z * s;
@@ -120,7 +120,7 @@ public class Vector3f {
 	 * @param v
 	 * @param s
 	 */
-	public void multiply(Vector3f v, float s){
+	public void multiply(Vector3 v, float s){
 		x = v.x * s;
 		y = v.y * s;
 		z = v.z * s;
@@ -139,7 +139,7 @@ public class Vector3f {
 	 * @param v
 	 * @param s
 	 */
-	public void divide(Vector3f v, float s){
+	public void divide(Vector3 v, float s){
 		assert(Math.abs(s) > 0.0f): "division by zero";
 		x = v.x / s;
 		y = v.y / s;
@@ -151,7 +151,7 @@ public class Vector3f {
 	 * @param v
 	 * @return
 	 */
-	public float inner(Vector3f v){
+	public float inner(Vector3 v){
 		return x * v.x + y * v.y + z * v.z;
 	}
 
@@ -159,7 +159,7 @@ public class Vector3f {
 	 * 外積代入
 	 * @param v
 	 */
-	public void cross(Vector3f v){
+	public void outer(Vector3 v){
 		final float x = this.x;
 		final float y = this.y;
 		final float z = this.z;
@@ -173,7 +173,7 @@ public class Vector3f {
 	 * @param v1
 	 * @param v2
 	 */
-	public void cross(Vector3f v1, Vector3f v2){
+	public void outer(Vector3 v1, Vector3 v2){
 		x = v1.y * v2.z - v1.z * v2.y;
 		y = v1.z * v2.x - v1.x * v2.z;
 		z = v1.x * v2.y - v1.y * v2.x;
@@ -206,7 +206,7 @@ public class Vector3f {
 	 * v を正規化し代入
 	 * @param v
 	 */
-	public void normalize(Vector3f v){
+	public void normalize(Vector3 v){
 		final float l = v.length();
 		assert(l > 0.0f): "division by zero";
 		multiply(v, 1.0f / l);
@@ -223,7 +223,7 @@ public class Vector3f {
 	 * v の方向を反転し代入
 	 * @param v
 	 */
-	public void negate(Vector3f v){
+	public void negate(Vector3 v){
 		x = -v.x;
 		y = -v.y;
 		z = -v.z;
@@ -234,7 +234,7 @@ public class Vector3f {
 	 * @param v
 	 * @return
 	 */
-	public boolean isPerpendicular(Vector3f v){
+	public boolean isPerpendicular(Vector3 v){
 		return !(Math.abs(inner(v)) > 0.0f);
 	}
 
@@ -243,7 +243,9 @@ public class Vector3f {
 	 * @param v
 	 * @return
 	 */
-	public boolean isParallel(Vector3f v){
+	public boolean isParallel(Vector3 v){
+		assert(FloatComparer.almostEquals(1.0f, length(), 1)): "this is not an unit vector.";
+		assert(FloatComparer.almostEquals(1.0f, v.length(), 1)): "v is not an unit vector.";
 		return !(Math.abs(inner(v)) < 1.0f);
 	}
 
@@ -252,7 +254,7 @@ public class Vector3f {
 	 * @param v
 	 * @return The angle in radians
 	 */
-	public float angle(Vector3f v){
+	public float angle(Vector3 v){
 		return (float)Math.acos(inner(v));
 	}
 
@@ -262,7 +264,7 @@ public class Vector3f {
 	 * @param v2
 	 * @param t		[0,1]
 	 */
-	public void lerp(Vector3f v1, Vector3f v2, float t){
+	public void lerp(Vector3 v1, Vector3 v2, float t){
 		x = v1.x + (v2.x - v1.x) * t;
 		y = v1.y + (v2.y - v1.y) * t;
 		z = v1.z + (v2.z - v1.z) * t;
@@ -274,7 +276,7 @@ public class Vector3f {
 	 * @param v2	‖v2‖ = 1
 	 * @param t		[0,1]
 	 */
-	public void slerp(Vector3f v1, Vector3f v2, float t){
+	public void slerp(Vector3 v1, Vector3 v2, float t){
 		final double theta = v1.angle(v2);
 		if(theta > 0.0f){
 			final float fx = (float)Math.sin(theta * (1.0f - t));
@@ -302,7 +304,7 @@ public class Vector3f {
 	 * @param f     v2 に対する重み係数.
 	 * @param g     v3 に対する重み係数.
 	 */
-	public void BaryCentric(Vector3f v1, Vector3f v2, Vector3f v3, float f, float g){
+	public void BaryCentric(Vector3 v1, Vector3 v2, Vector3 v3, float f, float g){
 		x = v1.x + f * (v2.x - v1.x) + g * (v3.x - v1.x);
 		y = v1.y + f * (v2.y - v1.y) + g * (v3.y - v1.y);
 		z = v1.z + f * (v2.z - v1.z) + g * (v3.z - v1.z);
@@ -313,7 +315,7 @@ public class Vector3f {
 	 * @param m
 	 * @param v
 	 */
-	public void multiply(CMatrix4f m, Vector3f v){
+	public void multiply(CMatrix4 m, Vector3 v){
 		x = m.m11 * v.x + m.m12 * v.y + m.m13 * v.z + m.m14;
 		y = m.m21 * v.x + m.m22 * v.y + m.m23 * v.z + m.m24;
 		z = m.m31 * v.x + m.m32 * v.y + m.m33 * v.z + m.m34;
@@ -324,7 +326,7 @@ public class Vector3f {
 	 * @param v
 	 * @param m
 	 */
-	public void multiply(Vector3f v, RMatrix4f m){
+	public void multiply(Vector3 v, RMatrix4 m){
 		x = v.x * m.m11 + v.y * m.m21 + v.z * m.m31 + m.m41;
 		y = v.x * m.m12 + v.y * m.m22 + v.z * m.m32 + m.m42;
 		z = v.x * m.m13 + v.y * m.m23 + v.z * m.m33 + m.m43;
@@ -336,7 +338,7 @@ public class Vector3f {
 	 * @param v
 	 * @param q
 	 */
-	public void rotate(Vector3f v, Quaternion q){
+	public void rotate(Vector3 v, Quaternion q){
 		final float x_sq = q.x * q.x;
 		final float y_sq = q.y * q.y;
 		final float z_sq = q.z * q.z;
@@ -353,6 +355,6 @@ public class Vector3f {
 
 	@Override
 	public String toString(){
-		return "Vector3f{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
+		return "Vector3{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
 	}
 }

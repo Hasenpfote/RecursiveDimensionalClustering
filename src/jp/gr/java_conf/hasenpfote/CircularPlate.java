@@ -2,7 +2,7 @@ package jp.gr.java_conf.hasenpfote;
 
 import java.awt.Graphics2D;
 import jp.gr.java_conf.hasenpfote.framework.KeyboardInput;
-import jp.gr.java_conf.hasenpfote.math.Vector2f;
+import jp.gr.java_conf.hasenpfote.math.Vector2;
 
 /**
  *
@@ -14,9 +14,9 @@ public class CircularPlate{
 	private CircularPlatePhysicsComponent pc = null;
 	private CircularPlateRenderComponent rc = null;
 
-	private final Vector2f position = new Vector2f();
-	private final Vector2f linear_velocity = new Vector2f();
-	private final Vector2f force = new Vector2f();
+	private final Vector2 position = new Vector2();
+	private final Vector2 linear_velocity = new Vector2();
+	private final Vector2 force = new Vector2();
 	private float mass, inv_mass;
 	private float radius;
 
@@ -43,15 +43,15 @@ public class CircularPlate{
 			rc.update(this, g2d);
 	}
 
-	public Vector2f getPosition(){
+	public Vector2 getPosition(){
 		return position;
 	}
 
-	public Vector2f getLinearVelocity(){
+	public Vector2 getLinearVelocity(){
 		return linear_velocity;
 	}
 
-	public Vector2f getForce(){
+	public Vector2 getForce(){
 		return force;
 	}
 
