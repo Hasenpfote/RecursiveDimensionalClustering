@@ -6,8 +6,8 @@ import jp.gr.java_conf.hasenpfote.math.Vector3;
  * Created by Hasenpfote on 2016/04/02.
  */
 public class LineSegment3 {
-	private Vector3 initial;
-	private Vector3 terminal;
+	private final Vector3 initial = new Vector3();
+	private final Vector3 terminal = new Vector3();
 
 	public LineSegment3(){
 	}
@@ -17,8 +17,8 @@ public class LineSegment3 {
 	}
 
 	public void set(Vector3 initial, Vector3 terminal){
-		this.initial = initial;
-		this.terminal = terminal;
+		this.initial.set(initial);
+		this.terminal.set(terminal);
 	}
 
 	public Vector3 getInitial(){

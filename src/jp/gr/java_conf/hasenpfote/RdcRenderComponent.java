@@ -23,6 +23,7 @@ public class RdcRenderComponent{
 		for(Rdc.Cluster cluster : clusters){
 			bbox_rc.update(cluster.getBoundingBox(), g2d);
 		}
+		g2d.setColor(old);
 		//
 		long num_combinations = 0;
 		int num_objects = 0;
@@ -32,15 +33,9 @@ public class RdcRenderComponent{
 			num_combinations += (size > 2)? MathUtil.combination(size, 2) : 1;
 		}
 		long max_combinations = (num_objects > 2)? MathUtil.combination(num_objects, 2) : ((num_objects == 0)? 0 : 1);
-		//
-		FontMetrics metrics = g2d.getFontMetrics();
-		g2d.setColor(Color.YELLOW);
-		g2d.drawString("objects=" + num_objects, 0, 2 * metrics.getHeight() + metrics.getAscent());
-		g2d.drawString("clusters=" + clusters.size(), 0, 3 * metrics.getHeight() + metrics.getAscent());
-		//g2d.drawString("collisions=" + pairs.size(), 0, 2 * metrics.getHeight() + metrics.getAscent());
-		int rate = (int)((double)num_combinations / max_combinations * 100);
-		g2d.drawString("combinations=" + num_combinations + " / " + max_combinations + " (" + rate + "%)", 0, 4 * metrics.getHeight() + metrics.getAscent());
-
-		g2d.setColor(old);
+		double rate = (double)num_combinations / max_combinations;
+		DebugStrings.getInstance().add("objects:" + num_objects);
+		DebugStrings.getInstance().add("clusters:" + clusters.size());
+		DebugStrings.getInstance().add("combinations:" + num_combinations + "/" + max_combinations + " (" + DebugStrings.PERCENT_FORMAT.format(rate) + ")");
 	}
 }

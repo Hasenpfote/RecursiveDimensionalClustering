@@ -6,8 +6,8 @@ import jp.gr.java_conf.hasenpfote.math.Vector2;
  * Created by Hasenpfote on 2016/04/02.
  */
 public class LineSegment2 {
-	private Vector2 initial;
-	private Vector2 terminal;
+	private final Vector2 initial = new Vector2();
+	private final Vector2 terminal = new Vector2();
 
 	public LineSegment2(){
 	}
@@ -17,8 +17,8 @@ public class LineSegment2 {
 	}
 
 	public void set(Vector2 initial, Vector2 terminal){
-		this.initial = initial;
-		this.terminal = terminal;
+		this.initial.set(initial);
+		this.terminal.set(terminal);
 	}
 
 	public Vector2 getInitial(){

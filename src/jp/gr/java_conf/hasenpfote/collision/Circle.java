@@ -6,7 +6,7 @@ import jp.gr.java_conf.hasenpfote.math.Vector2;
  * Created by Hasenpfote on 2016/04/02.
  */
 public class Circle {
-	private Vector2 center;
+	private final Vector2 center = new Vector2();
 	private float radius;
 
 	public Circle(){
@@ -17,7 +17,7 @@ public class Circle {
 	}
 
 	public void set(Vector2 center, float radius){
-		this.center = center;
+		this.center.set(center);
 		this.radius = radius;
 	}
 

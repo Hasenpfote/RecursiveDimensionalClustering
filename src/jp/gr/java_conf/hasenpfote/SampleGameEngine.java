@@ -1,12 +1,6 @@
 package jp.gr.java_conf.hasenpfote;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -15,6 +9,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Random;
@@ -30,7 +25,6 @@ import jp.gr.java_conf.hasenpfote.physics.Physics;
 public final class SampleGameEngine extends GameEngine{
 
 	private static final int DEFAULT_FPS = 60;
-	private static final Font font = new Font(Font.SERIF, Font.BOLD, 18);
 	private static final Random rnd = new Random();
 
 	public enum InputDevice{
@@ -126,8 +120,12 @@ public final class SampleGameEngine extends GameEngine{
 		if(mouse != null)
 			mouse.poll();
 
-		if(keyboard.isKeyDownOnce(KeyEvent.VK_SPACE))
+		if(keyboard.isKeyDownOnce(KeyEvent.VK_SPACE)){
+			if(!pause){
+				System.gc();
+			}
 			pause = !pause;
+		}
 
 		if(keyboard.isKeyDownOnce(KeyEvent.VK_F1))
 			debug = !debug;
@@ -357,21 +355,26 @@ public final class SampleGameEngine extends GameEngine{
 */
 	}
 
+	public String getMemoryInfo(){
+		DecimalFormat format = DebugStrings.MEM_FORMAT;
+		long free =  Runtime.getRuntime().freeMemory() / 1024;
+		long total = Runtime.getRuntime().totalMemory() / 1024;
+		long max =   Runtime.getRuntime().maxMemory() / 1024;
+		long used =  total - free;
+		return format.format(used) + "/" + format.format(total) + " (" + format.format(max) + ")";
+	}
+
 	@Override
 	protected void renderFrame(Graphics2D g2d){
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2d.setFont(font);
 		// 背景のクリア
 		g2d.clearRect(0, 0, screen_width, screen_height);
-		// FPSの表示
-		FontMetrics metrics = g2d.getFontMetrics();
-		g2d.setColor(Color.YELLOW);
-		String render_fps = String.format("%.2f", getFps());
-		String update_fps = String.format("%.2f", getUps());
-		g2d.drawString("fps : ups =" + render_fps + " : " + update_fps, 0, metrics.getAscent());
-		//g2d.drawString("fps=" + Double.toString(getRenderFps()) + " / " + Double.toString(getUpdateFps()), 0, metrics.getAscent());
-		g2d.drawString("gravity: " + ((gravity_enabled)? "On" : "Off"), 0, metrics.getHeight() + metrics.getAscent());
+		//
+		DecimalFormat format = DebugStrings.FP_FORMAT;
+		DebugStrings.getInstance().add("fps/ups:" + format.format(getFps()) + "/" + format.format(getUps()));
+		DebugStrings.getInstance().add("mem:" + getMemoryInfo());
+		DebugStrings.getInstance().add("gravity:" + ((gravity_enabled)? "On" : "Off"));
 		{
 			g2d.setColor(Color.WHITE);
 			for(CircularPlate cp : objects){
@@ -381,5 +384,8 @@ public final class SampleGameEngine extends GameEngine{
 				rdc_rc.update(rdc, g2d);
 			}
 		}
+		// デバッグ表示
+		DebugStrings.getInstance().render(g2d);
+		DebugStrings.getInstance().clear();
 	}
 }

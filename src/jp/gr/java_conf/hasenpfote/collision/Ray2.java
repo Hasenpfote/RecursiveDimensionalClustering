@@ -7,8 +7,8 @@ import jp.gr.java_conf.hasenpfote.math.Vector2;
  * Created by Hasenpfote on 2016/04/02.
  */
 public class Ray2 {
-	private Vector2 origin;
-	private Vector2 direction;
+	private final Vector2 origin = new Vector2();
+	private final Vector2 direction = new Vector2();
 
 	public Ray2(){
 	}
@@ -18,9 +18,8 @@ public class Ray2 {
 	}
 
 	public void set(Vector2 origin, Vector2 direction){
-		assert(FloatComparer.almostEquals(1.0f, direction.length(), 1)): "direction is not an unit vector.";
-		this.origin = origin;
-		this.direction = direction;
+		this.origin.set(origin);
+		this.direction.set(direction);
 	}
 
 	public Vector2 getOrigin(){
