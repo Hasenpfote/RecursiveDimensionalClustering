@@ -127,7 +127,7 @@ public final class CollideUtil{
 	 * @param ray
 	 * @return
 	 */
-	public static int closestPoint(float[] roots, Circle circle, Ray2 ray){
+	public static MathUtil.QuadraticDiscriminant closestPoint(float[] roots, Circle circle, Ray2 ray){
 		final Vector2 center = circle.getCenter();
 		final float r = circle.getRadius();
 		final Vector2 org = ray.getOrigin();
@@ -147,23 +147,25 @@ public final class CollideUtil{
 	 * @return
 	 */
 	public static boolean closestPoint(Vector2 point, Circle circle, Ray2 ray){
-		final int res = closestPoint(roots, circle, ray);
-		if(res < 0)
-			return false;
-		if(res == 0){
-			if(roots[0] < 0.0f)
+		switch(closestPoint(roots, circle, ray)){
+			case ComplexRoots:
 				return false;
-			point.set(ray.getOrigin());
-			point.madd(ray.getDirection(), roots[0]);
-			return true;
+			case EqualRoots:
+				if(roots[0] < 0.0f)
+					return false;
+				point.set(ray.getOrigin());
+				point.madd(ray.getDirection(), roots[0]);
+				return true;
+			case RealRoots:
+				if(roots[1] < 0.0f)
+					return false;
+				final float root = (roots[0] < 0.0f)? roots[1] : roots[0];
+				point.set(ray.getOrigin());
+				point.madd(ray.getDirection(), root);
+				return true;
+			default:
+				return false;
 		}
-		if(roots[1] < 0.0f)
-			return false;
-
-		final float root = (roots[0] < 0.0f)? roots[1] : roots[0];
-		point.set(ray.getOrigin());
-		point.madd(ray.getDirection(), root);
-		return true;
 	}
 
 	/**
@@ -173,7 +175,7 @@ public final class CollideUtil{
 	 * @param seg
 	 * @return
 	 */
-	public static int closestPoint(float[] roots, Circle circle, LineSegment2 seg){
+	public static MathUtil.QuadraticDiscriminant closestPoint(float[] roots, Circle circle, LineSegment2 seg){
 		final Vector2 center = circle.getCenter();
 		final float r = circle.getRadius();
 		final Vector2 initial = seg.getInitial();
@@ -194,24 +196,27 @@ public final class CollideUtil{
 	 * @return
 	 */
 	public static boolean closestPoint(Vector2 point, Circle circle, LineSegment2 seg){
-		final int res = closestPoint(roots, circle, seg);
-		if(res < 0)
-			return false;
-		if(res == 0){
-			if(roots[0] < 0.0f || roots[0] > 1.0f)
+		switch(closestPoint(roots, circle, seg)){
+			case ComplexRoots:
 				return false;
-			point.lerp(seg.getInitial(), seg.getTerminal(), roots[0]);
-			return true;
+			case EqualRoots:
+				if(roots[0] < 0.0f || roots[0] > 1.0f)
+					return false;
+				point.lerp(seg.getInitial(), seg.getTerminal(), roots[0]);
+				return true;
+			case RealRoots:
+				if(roots[0] >= 0.0f && roots[0] <= 1.0f){
+					point.lerp(seg.getInitial(), seg.getTerminal(), roots[0]);
+					return true;
+				}
+				if(roots[1] >= 0.0f && roots[1] <= 1.0f){
+					point.lerp(seg.getInitial(), seg.getTerminal(), roots[1]);
+					return true;
+				}
+				return false;
+			default:
+				return false;
 		}
-		if(roots[0] >= 0.0f && roots[0] <= 1.0f){
-			point.lerp(seg.getInitial(), seg.getTerminal(), roots[0]);
-			return true;
-		}
-		if(roots[1] >= 0.0f && roots[1] <= 1.0f){
-			point.lerp(seg.getInitial(), seg.getTerminal(), roots[1]);
-			return true;
-		}
-		return false;
 	}
 
 	/**

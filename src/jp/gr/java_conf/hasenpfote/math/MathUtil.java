@@ -93,6 +93,12 @@ public final class MathUtil{
 		return ncr;
 	}
 
+	public enum QuadraticDiscriminant{
+		ComplexRoots,	// two complex roots.
+		EqualRoots,		// two equal real roots.
+		RealRoots;		// two different real roots.
+	}
+
 	/**
 	 * 二次方程式の求根.
 	 * @param roots	根.(サイズ 2 を必要とする)
@@ -101,10 +107,10 @@ public final class MathUtil{
 	 * @param c
 	 * @return -1 なら虚根、0 なら重根、1 なら実数根.
 	 */
-	public static int solveQuadratic(float[] roots, float a, float b, float c){
+	public static QuadraticDiscriminant solveQuadratic(float[] roots, float a, float b, float c){
 		final float discriminant = b * b - 4.0f * a * c;
 		if(discriminant < 0.0f)	// equation has imaginary roots.
-			return -1;
+			return QuadraticDiscriminant.ComplexRoots;
 
 		final float x = (Math.abs(b) + (float)Math.sqrt(discriminant)) / (2.0f * a);
 		if(discriminant > 0.0f){// equation has 2 roots.
@@ -120,10 +126,10 @@ public final class MathUtil{
 				roots[0] = -x;
 				roots[1] = -c / (a * x);// rationalize the numerator.(Muller's method)
 			}
-			return 1;
+			return QuadraticDiscriminant.RealRoots;
 		}
 		// equation has 1 root
 		roots[0] = (b < 0.0f)? x : -x;
-		return 0;
+		return QuadraticDiscriminant.EqualRoots;
 	}
 }
